@@ -138,14 +138,24 @@ A full run takes a while: expect ten to twenty minutes of wall-clock time and se
 checkpoints on a high-stakes purchase. That is the point. For a $15 decision, say
 `--light` or do not use the skill.
 
-## A worked example
+## Worked examples and a live demo
 
-[`examples/travel-charger.md`](examples/travel-charger.md) shows what a saved run looks
-like at every gate: the confirmed job statement, the forms enumerated, the coverage table
-with two channels honestly marked PARTIAL, the tradeoff log with a stated-versus-revealed
-preference, the filtered-out list, the steelman, a per-tier decision with confidence
-calibrated per claim, and the blind-spot section. It is synthetic: the shape is real, the
-numbers are placeholders.
+Two synthetic runs show what a saved run looks like at every gate: the confirmed job
+statement, the forms enumerated, the coverage table with channels honestly marked PARTIAL,
+the tradeoff log with a stated-versus-revealed preference, the filtered-out list, the
+steelman, a per-tier decision with confidence calibrated per claim, and the blind-spot
+section. The shape is real, the numbers are placeholders.
+
+- [`examples/travel-charger.md`](examples/travel-charger.md): a GaN travel charger.
+- [`examples/christmas-string-lights.md`](examples/christmas-string-lights.md): outdoor
+  Christmas lights for a two-storey house in a cold climate.
+
+[`demo/shop-workflow.html`](demo/shop-workflow.html) replays the Christmas-lights run as an
+interactive page: click through the four steps, watch the gate panel count the evidence,
+flip the "thin census" switch to see a gate fail and the recommendation downgrade itself to
+a preliminary read, and press "Are you sure?" to see a challenge answered with evidence
+instead of a flipped pick. Open the file in a browser, or use the hosted copy:
+https://claude.ai/artifact/RWmGQd9uTNnnKES9WhYnMd
 
 ## What each step does
 
@@ -194,7 +204,8 @@ setup/
   mcp.json                  two Playwright MCP servers (browser, browser-headless)
   settings.json             permission rules to copy into .claude/settings.local.json
   SETUP.md                  the three levels in detail, verification, optional stealth browser
-examples/travel-charger.md  synthetic worked example
+examples/                   two synthetic worked examples
+demo/shop-workflow.html     interactive replay of one run (no build step, no dependencies)
 install.sh                  copies the skill; --browser also writes .mcp.json and the rules
 ```
 

@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Skill Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A guided replay of one synthetic /shop run: scope, census, evaluate and recommend, with the gate checks and the two-turn decision contract.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --surface-2: #e9eeec;
+  --ink: #16201b;
+  --ink-2: #46534d;
+  --ink-3: #7a8782;
+  --line: #d9e0dd;
+  --line-strong: #bfcac5;
+  --accent: #1d6b4b;
+  --accent-ink: #155239;
+  --accent-soft: #e1f0e8;
+  --on-accent: #ffffff;
+  --warn: #b3261e;
+  --warn-soft: #fbeae8;
+  --shadow: 0 1px 2px rgba(28, 27, 25, .05), 0 4px 16px rgba(28, 27, 25, .04);
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #182019;
+    --surface-2: #1f2a24;
+    --ink: #e6ece8;
+    --ink-2: #aab6b0;
+    --ink-3: #7c8983;
+    --line: #2a3630;
+    --line-strong: #3e4d45;
+    --accent: #7ed3a3;
+    --accent-ink: #a9e3c3;
+    --accent-soft: #1c3328;
+    --on-accent: #0b1a12;
+    --warn: #f08a80;
+    --warn-soft: #3a1e1b;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #182019;
+  --surface-2: #1f2a24;
+  --ink: #e6ece8;
+  --ink-2: #aab6b0;
+  --ink-3: #7c8983;
+  --line: #2a3630;
+  --line-strong: #3e4d45;
+  --accent: #7ed3a3;
+  --accent-ink: #a9e3c3;
+  --accent-soft: #1c3328;
+  --on-accent: #0b1a12;
+  --warn: #f08a80;
+  --warn-soft: #3a1e1b;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 720px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+
+/* ---------- header ---------- */
+.top { padding: 40px 0 8px; }
+.top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+h1 { font: 600 clamp(30px, 5vw, 44px)/1.08 var(--serif); letter-spacing: -.01em; margin: 0; }
+.lede { font-size: 17px; color: var(--ink-2); max-width: 62ch; margin: 16px 0 0; }
+.howto { margin: 20px 0 0; padding: 14px 16px; border-left: 2px solid var(--accent); background: var(--surface); color: var(--ink-2); font-size: 15px; max-width: 72ch; border-radius: 0 8px 8px 0; }
+.howto strong { color: var(--ink); font-weight: 600; }
+.top-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn {
+  font: 500 14px/1 var(--sans); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: 10px 16px;
+  cursor: pointer; transition: border-color .15s, background .15s, color .15s;
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn:focus-visible, .step-btn:focus-visible, .choice:focus-visible, .chip-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-ghost { background: transparent; }
+
+/* ---------- stepper ---------- */
+.stepper-wrap { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 20px 0 12px; margin-top: 16px; border-bottom: 1px solid var(--line); }
+.stepper { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.step-btn {
+  width: 100%; text-align: left; background: transparent; border: 0; border-top: 2px solid var(--line);
+  padding: 10px 2px 2px; cursor: pointer; color: var(--ink-3); font: inherit;
+  display: flex; align-items: baseline; gap: 8px; min-width: 0;
+}
+.step-btn .n { font: 500 12px/1 var(--mono); }
+.step-btn .t { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step-btn[data-state="done"] { color: var(--ink-2); border-top-color: var(--ink-3); }
+.step-btn[aria-current="step"] { color: var(--ink); border-top-color: var(--accent); }
+.step-btn[aria-current="step"] .n { color: var(--accent); }
+.caption { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); max-width: 90ch; }
+.caption kbd { font: 500 11px/1 var(--mono); border: 1px solid var(--line-strong); border-radius: 4px; padding: 2px 5px; color: var(--ink-2); }
+@media (max-width: 600px) {
+  .stepper-wrap { position: static; }
+}
+@media (max-width: 520px) {
+  .stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 4px; }
+  .top-row { flex-direction: column; }
+}
+
+/* ---------- layout ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; padding: 32px 0 40px; align-items: start; }
+.flow { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.aside { position: sticky; top: 112px; min-width: 0; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .aside { position: static; }
+  .flow > .gate { margin: 0; }
+}
+.step-title { margin: 0 0 4px; }
+.step-title h2 { font: 600 28px/1.15 var(--serif); margin: 0; }
+.step-title p { margin: 6px 0 0; color: var(--ink-2); max-width: 64ch; }
+
+/* ---------- turns ---------- */
+.turn { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
+.turn-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.turn-head .who { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.turn-head .what { font-weight: 600; font-size: 15px; }
+.turn-head .meta { font-size: 13px; color: var(--ink-3); margin-left: auto; }
+.turn-body { padding: 20px; }
+.turn-body > * + * { margin-top: 20px; }
+.turn-end { display: flex; align-items: center; gap: 12px; padding: 0 20px 16px; font: 400 12px/1 var(--mono); color: var(--ink-3); }
+.turn-end::before, .turn-end::after { content: ""; height: 1px; background: var(--line); flex: 1; }
+.turn.past { opacity: .62; }
+.turn.past .turn-body { max-height: 220px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.turn-b { border-style: dashed; border-color: var(--line-strong); background: transparent; box-shadow: none; }
+.turn-b .q { margin: 0 0 14px; font-weight: 500; }
+.choices { display: flex; flex-wrap: wrap; gap: 10px; }
+.choice {
+  font: 500 15px/1.3 var(--sans); text-align: left; cursor: pointer;
+  padding: 12px 18px; border-radius: 10px; border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink); max-width: 100%;
+  transition: border-color .15s, background .15s;
+}
+.choice:hover { border-color: var(--ink-3); }
+.choice.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.choice.primary:hover { filter: brightness(1.05); }
+.choice small { display: block; font-weight: 400; font-size: 13px; opacity: .8; margin-top: 3px; }
+.choice-tag { font: 500 12px/1 var(--mono); margin-right: 6px; }
+.note { font-size: 14px; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin: 14px 0 0; }
+.reveal { animation: rise .45s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- content atoms ---------- */
+h3 { font: 600 13px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+.prose p { margin: 0 0 12px; max-width: 68ch; }
+.prose p:last-child { margin-bottom: 0; }
+.fields { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 0; margin: 0; border-top: 1px solid var(--line); }
+.fields dt, .fields dd { padding: 10px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.fields dt { font: 500 13px/1.5 var(--mono); color: var(--ink-3); padding-right: 16px; }
+.fields dd { font-size: 15px; }
+.fields code, .mono { font: 400 13px/1.5 var(--mono); }
+.fields em { font-family: var(--serif); font-style: italic; font-size: 16px; }
+@media (max-width: 600px) {
+  .fields { grid-template-columns: minmax(0, 1fr); }
+  .fields dt { border-bottom: 0; padding-bottom: 0; }
+}
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font: 500 12px/1.3 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--mono); white-space: nowrap; }
+tr.dropped td { color: var(--ink-3); }
+tr.dropped td:first-child span { text-decoration: line-through; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); white-space: nowrap; }
+.chip .f { color: var(--ink-3); font-size: 12px; }
+.chip.dim { opacity: .4; text-decoration: line-through; }
+.status { font: 500 12px/1 var(--mono); padding: 4px 8px; border-radius: 4px; white-space: nowrap; display: inline-block; }
+.status.covered { color: var(--ink-2); background: var(--surface-2); }
+.status.na { color: var(--ink-3); border: 1px dashed var(--line-strong); }
+.status.partial { color: var(--accent-ink); background: var(--accent-soft); }
+.pchip { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; background: var(--accent); color: var(--on-accent); margin-left: 6px; }
+.callout { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 16px; background: var(--surface-2); }
+.callout .k { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 8px; }
+.callout p { margin: 0; }
+.banner-warn { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--ink); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+.flag-x { color: var(--warn); font-weight: 600; white-space: nowrap; }
+.flag-w { white-space: nowrap; }
+
+/* ---------- gate panel ---------- */
+.gate { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
+.gate-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.gate-head h3 { margin: 0; }
+.gate-state { font: 500 12px/1 var(--mono); color: var(--ink-3); }
+.gate-state.pass { color: var(--accent); }
+.gate-state.fail { color: var(--warn); }
+.gate-sub { font-size: 13px; color: var(--ink-3); margin: 0 0 12px; }
+.checks { list-style: none; margin: 0; padding: 0; }
+.check { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.check .mark { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: inline-grid; place-items: center; font-size: 11px; line-height: 1; transform: translateY(2px); }
+.check .val { font: 500 13px/1.4 var(--mono); color: var(--ink-3); text-align: right; white-space: nowrap; }
+.check .lbl { color: var(--ink-3); }
+.check.on .lbl { color: var(--ink); }
+.check.on .val { color: var(--ink-2); }
+.check.on .mark { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+.check.on .mark::after { content: "✓"; }
+.check.bad .mark { border-color: var(--warn); background: var(--warn); color: var(--bg); }
+.check.bad .mark::after { content: "!"; font-weight: 700; }
+.check.bad .val, .check.bad .lbl { color: var(--warn); }
+.check .sub { display: block; font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.gate-fail { margin-top: 12px; border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 12px; font: 400 13px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.toggle { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); cursor: pointer; }
+.toggle input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; }
+.gate-foot { font-size: 12px; color: var(--ink-3); margin: 12px 0 0; }
+
+/* ---------- tradeoffs ---------- */
+.tradeoffs { display: grid; gap: 12px; }
+.trade { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.trade .tq { font-weight: 600; margin: 0 0 10px; }
+.trade-sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.trade-sides div { font-size: 14px; color: var(--ink-2); }
+.trade-sides b { display: block; color: var(--ink); font-weight: 500; margin-bottom: 2px; }
+@media (max-width: 560px) { .trade-sides { grid-template-columns: minmax(0, 1fr); } }
+.differ { color: var(--accent-ink); font-weight: 600; }
+
+/* ---------- challenge ---------- */
+.versus { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.side { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.side.current { border-color: var(--accent); }
+.side .lab { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.side.current .lab { color: var(--accent); }
+.side h4 { font: 600 18px/1.25 var(--serif); margin: 6px 0 10px; }
+.side ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
+.side li + li { margin-top: 6px; }
+.side li.against { color: var(--ink); }
+@media (max-width: 600px) { .versus { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- recommend ---------- */
+.verdict { font: 600 24px/1.2 var(--serif); margin: 0; }
+.verdict.prelim { color: var(--warn); }
+.tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tier { border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tier.pick { border-color: var(--accent); background: var(--accent-soft); }
+.tier .tl { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.tier.pick .tl { color: var(--accent-ink); }
+.tier h4 { font: 600 18px/1.25 var(--serif); margin: 0; }
+.tier p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.conf { font-size: 13px; border-top: 1px solid var(--line); padding-top: 8px; margin-top: auto; color: var(--ink-2); }
+.conf div + div { margin-top: 4px; }
+.conf i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--ink); }
+@media (max-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr); } }
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline li { position: relative; padding: 0 0 16px 28px; font-size: 14px; color: var(--ink-2); }
+.timeline li::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: -8px; width: 1px; background: var(--line-strong); }
+.timeline li:last-child::before { display: none; }
+.timeline li::after { content: ""; position: absolute; left: 0; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--ink-3); }
+.timeline li.first::after, .timeline li.last::after { background: var(--accent); border-color: var(--accent); }
+.timeline li b { color: var(--ink); font-weight: 600; }
+.timeline .quote { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); }
+.cov-row.hl td { background: var(--accent-soft); }
+.blind { display: grid; gap: 10px; }
+.bs { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: start; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); transition: background .15s; }
+.bs.derived { border-left: 3px solid var(--accent); }
+.bs.hl { background: var(--accent-soft); }
+.bs .src { font: 500 12px/1.4 var(--mono); color: var(--accent-ink); }
+.bs .src.supp { color: var(--ink-3); }
+.bs b { color: var(--ink); font-weight: 600; }
+.chip-link { cursor: pointer; border: 0; padding: 0; background: none; font: inherit; color: inherit; }
+.chip-s { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line-strong); color: var(--ink-3); }
+.derive-line { font: 400 12px/1.4 var(--mono); color: var(--accent-ink); display: flex; align-items: center; gap: 8px; margin: -4px 0 0; }
+.derive-line::before { content: ""; width: 1px; height: 22px; background: var(--accent); margin-left: 14px; }
+.list-tight { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
+.list-tight li + li { margin-top: 4px; }
+.saved { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; }
+
+footer { border-top: 1px solid var(--line); padding: 24px 0 48px; font-size: 13px; color: var(--ink-3); }
+footer a { color: var(--accent-ink); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; }
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <div class="top-row">
+    <div>
+      <p class="eyebrow">Claude Code skill · /shop</p>
+      <h1>Shop Skill Walkthrough</h1>
+      <p class="lede">One purchase request, four steps, a human decision between every pair. Finds your best product, not the best product.</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-ghost" id="themeBtn" type="button" aria-label="Switch colour theme">Dark</button>
+      <button class="btn" id="replayBtn" type="button">Replay</button>
+    </div>
+  </div>
+  <p class="howto"><strong>How to read this demo.</strong> This page replays one synthetic run (outdoor Christmas lights for a two-storey house in a cold climate) exactly as the user would see it, step by step. Click a decision to move on, use the arrow keys to jump between steps, and watch the gate panel count the evidence before each decision is offered.</p>
+</header>
+
+<div class="stepper-wrap">
+  <nav class="wrap" aria-label="Workflow steps">
+    <ol class="stepper" id="stepper"></ol>
+    <p class="caption">Evidence and decision never share a turn: Turn A renders the evidence in the message body and ends with no tool call; Turn B asks only the decision, because tool output is collapsed in most Claude Code surfaces. <kbd>←</kbd> <kbd>→</kbd> move between steps.</p>
+  </nav>
+</div>
+
+<main class="wrap layout">
+  <div class="flow" id="flow" aria-live="polite"></div>
+  <aside class="aside" id="aside"></aside>
+</main>
+
+<footer class="wrap">
+  <p>All brands are real; prices, counts and quotes are illustrative placeholders from a synthetic run.</p>
+  <p><a href="https://github.com/doriru89/shop-skill" rel="noopener">github.com/doriru89/shop-skill</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= data: the synthetic run ================= */
+  var STEPS = [
+    { id: "scope", title: "Scope", blurb: "Lock what is being bought and who is buying it. No search yet." },
+    { id: "census", title: "Census", blurb: "Break the frame, then map the whole market before forming an opinion." },
+    { id: "evaluate", title: "Evaluate", blurb: "Forced tradeoffs reveal what the user values; the shortlist gets evidence, a scope cross-check and a stress test." },
+    { id: "recommend", title: "Recommend", blurb: "Best per tier, how the request evolved, what was reached, and what was not." }
+  ];
+
+  var SCOPE_FIELDS = [
+    ["Request", "“I want outdoor Christmas lights for the front of my house”"],
+    ["Job statement", "<em>A homeowner needs the front of the house to look festive from the street for six weeks a year with one afternoon of setup, because they resent the yearly tangle.</em>"],
+    ["Branch", "Outdoor holiday string lights, LED"],
+    ["Forms enumerated", "Classic LED strings · net lights for shrubs · laser / projector · app-controlled RGB strings · permanent eave lighting · seasonal installer · window candles only (non-consumption)"],
+    ["User", "One household; two-storey house, front eave line plus porch railing; cold climate; intermediate knowledge (knows “LED” and “warm white”, not connection limits or GFCI behaviour)"],
+    ["Existing products", "None: no lights, no outdoor timer, no outdoor-rated cords"],
+    ["Stakes", "<code>max(cost: low, harm: low–medium (outdoor electrical), competence gap: low)</code> → <b>LIGHT</b>; electrical risk carried into the gap checklist"],
+    ["Budget", "$100–250, soft"],
+    ["Language", "en"],
+    ["keyword_map", "Twinkly → “Strings” · Govee → “Christmas String Lights” / “Permanent Outdoor Lights” · Philips Hue → “Festavia” · Nanoleaf → “Essentials Holiday” · GE → “Energy Smart”"]
+  ];
+
+  var BRANDS = [
+    { n: "GE", f: "classic strings" },
+    { n: "Brizled", f: "classic strings" },
+    { n: "Govee", f: "smart strings · permanent DIY" },
+    { n: "Twinkly", f: "smart strings" },
+    { n: "Philips Hue", f: "smart strings" },
+    { n: "Nanoleaf", f: "smart strings" },
+    { n: "BlissLights", f: "projector" },
+    { n: "Trimlight", f: "permanent, installed" },
+    { n: "Jellyfish Lighting", f: "permanent, installed" }
+  ];
+  var THIN_BRANDS = ["GE", "Govee", "Twinkly", "Philips Hue"];
+
+  var TIERS = [
+    { p: "<$50", form: "Plug-and-play strings", brands: "GE, Brizled", thin: "GE", buys: "Warm white, a mechanical timer, done in an afternoon", watch: "Owner threads: whole sections dark after one winter" },
+    { p: "$50–150", form: "App-controlled strings", brands: "Govee, Twinkly, Nanoleaf", thin: "Govee, Twinkly", buys: "Colour, scenes and per-zone schedules from the phone", watch: "Wi-Fi setup; price per metre climbs fast" },
+    { p: "$150–300", form: "Premium smart", brands: "Philips Hue Festavia, longer Twinkly runs", thin: "Philips Hue Festavia", buys: "Best colour quality among app sets", watch: "Covers less railing per dollar" },
+    { p: "DIY kit to ~10×", form: "Permanent eave lighting", brands: "Govee Permanent Outdoor (DIY); Trimlight, Jellyfish Lighting (installed)", thin: "not reached", buys: "No ladder ever again; year-round use", watch: "Installed systems far outside the budget" }
+  ];
+
+  var COVERAGE = [
+    { layer: "Editorial", ch: "pro_reviews", st: "COVERED", note: "5 sources: best-of lists and two hands-on reviews; none followed a set into a second winter" },
+    { layer: "Editorial", ch: "corporate_background", st: "PARTIAL", p: "P1", note: "Two budget storefront brands untraceable beyond the marketplace listing" },
+    { layer: "Experience", ch: "community", st: "COVERED", note: "Reddit threads read directly via browser-headless (5)" },
+    { layer: "Experience", ch: "verified_purchase", st: "PARTIAL", p: "P2", note: "Star histograms only; review text login-walled" },
+    { layer: "Experience", ch: "video_reviews", st: "COVERED", note: "3 transcripts, two of them outdoor installs" },
+    { layer: "Primary", ch: "manufacturer", st: "COVERED", note: "5 live product pages; outdoor ratings read from spec pages" },
+    { layer: "Primary", ch: "marketplace_alt", st: "N_A", note: "No crowdfunded entrants this season" }
+  ];
+
+  var TRADES = [
+    { q: "Warm-white plug-and-play, or app-controlled RGB?",
+      a: { l: "Warm-white plug-and-play", c: "Cheapest; a timer does the scheduling; one look all season" },
+      b: { l: "App-controlled RGB", c: "Two to four times the price; scenes and colour from the phone" },
+      run: "b", rev: "scenes and colour from the phone matter" },
+    { q: "Seasonal strings, or a permanent eave track?",
+      a: { l: "Seasonal strings", c: "Up and down every year; inside the budget" },
+      b: { l: "Permanent eave track", c: "Installed once, never again; ~10× the budget installed" },
+      run: "a", rev: "one afternoon a year is acceptable; the budget is not" },
+    { q: "One long run on one outlet, or two zones?",
+      a: { l: "One run, one outlet, mechanical timer", c: "Simplest wiring; the whole house is one scene" },
+      b: { l: "Two zones (eave, railing) on app schedules", c: "Two outlets or a splitter; each part of the house on its own" },
+      run: "b", rev: "control over each part of the house" }
+  ];
+
+  var SHORTLIST = [
+    { n: "GE Energy Smart warm-white LED strings", tier: "budget", why: "Cheapest outdoor-rated option with long owner history", src: 3, flag: "⚠️ no app control" },
+    { n: "Govee outdoor Christmas String Lights", tier: "sweet spot", why: "Lowest price in the app-controlled class", src: 4, flag: "⚠️ reconnect complaints after power cuts" },
+    { n: "Twinkly Strings (outdoor)", tier: "sweet spot", why: "Strongest owner reports past a second season; per-zone scenes", src: 5, flag: "⚠️ priciest per metre in the class" },
+    { n: "Philips Hue Festavia (outdoor)", tier: "premium", why: "Best-reviewed colour quality among app sets", src: 3, flag: "⚠️ top of budget for the railing length" },
+    { n: "Twinkly Candies", tier: "—", why: "Dropped at scope cross-check", src: null, flag: "❌ not outdoor-rated", dropped: true }
+  ];
+
+  var FILTERED = [
+    { n: "Twinkly Candies", why: "Indoor-only; fails the outdoor constraint", b: "Twinkly" },
+    { n: "BlissLights projector", why: "Form excluded by the user at the landscape checkpoint", b: "BlissLights" },
+    { n: "Trimlight, Jellyfish Lighting", why: "Permanent install at ~10× the budget", b: "Trimlight" },
+    { n: "Govee Permanent Outdoor Lights", why: "Permanent form; user chose seasonal", b: "Govee" },
+    { n: "Nanoleaf Essentials Holiday", why: "Fewer owner reports past one season", b: "Nanoleaf" },
+    { n: "Two storefront brands", why: "No traceable company, cross-validated", b: "*" }
+  ];
+
+  /* ================= state ================= */
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var S;
+  function fresh() {
+    return {
+      step: 0, reached: 0,
+      done: [false, false, false, false],
+      thin: false, prelim: false, searchedMore: false,
+      viewer: [null, null, null], tradeIdx: 0,
+      evalPhase: "trade", challenged: false, sweet: "twinkly",
+      notes: {}, saved: false
+    };
+  }
+  S = fresh();
+  var run = 0;           // cancels stale timers
+  var timers = [];
+  function later(fn, ms) { var id = setTimeout(fn, reduce ? 0 : ms); timers.push(id); return id; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  var $flow = document.getElementById("flow");
+  var $aside = document.getElementById("aside");
+  var $stepper = document.getElementById("stepper");
+
+  /* ================= helpers ================= */
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function el(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+  function turnA(what, body, meta) {
+    return el(
+      '<section class="turn turn-a reveal">' +
+        '<header class="turn-head"><span class="who">Turn A</span><span class="what">' + what + '</span>' +
+        '<span class="meta">' + (meta || "message body") + '</span></header>' +
+        '<div class="turn-body">' + body + '</div>' +
+        '<div class="turn-end">turn ends · no tool call</div>' +
+      '</section>'
+    );
+  }
+  function turnB(q, choices, label, neutral) {
+    var btns = choices.map(function (c, i) {
+      return '<button type="button" class="choice' + (i === 0 && !neutral ? " primary" : "") + '" data-k="' + c.k + '">' +
+        (c.tag ? '<span class="choice-tag">' + c.tag + '</span>' : "") + c.l + (c.s ? "<small>" + c.s + "</small>" : "") + '</button>';
+    }).join("");
+    return el(
+      '<section class="turn turn-b reveal">' +
+        '<header class="turn-head"><span class="who">Turn B</span><span class="what">' + (label || "the decision") + '</span>' +
+        '<span class="meta">AskUserQuestion · options only</span></header>' +
+        '<div class="turn-body"><p class="q">' + q + '</p><div class="choices">' + btns + '</div><div class="slot"></div></div>' +
+      '</section>'
+    );
+  }
+  function bindChoices(node, handlers) {
+    node.querySelectorAll(".choice").forEach(function (b) {
+      b.addEventListener("click", function () { var h = handlers[b.getAttribute("data-k")]; if (h) h(b, node); });
+    });
+  }
+  function slotNote(node, html) {
+    var s = node.querySelector(".slot"); s.innerHTML = '<p class="note reveal">' + html + '</p>';
+  }
+  function markPast() { $flow.querySelectorAll(".turn").forEach(function (t) { t.classList.add("past"); }); }
+  function scrollTo(node) {
+    if (!node) return;
+    var r = node.getBoundingClientRect();
+    if (r.top > window.innerHeight * 0.75 || r.top < 100) {
+      window.scrollTo({ top: window.scrollY + r.top - 120, behavior: reduce ? "auto" : "smooth" });
+    }
+  }
+
+  /* ================= gate panel ================= */
+  var gateNode = null;
+  function gateChecks(step) {
+    if (step === 0) return [
+      { l: "Required fields non-empty", v: "10 / 10" },
+      { l: "Stakes routed", v: "LIGHT", sub: "gates below use ≥5 brands, ≥10 products" }
+    ];
+    if (step === 1) {
+      var t = S.thin;
+      return [
+        { l: "Brands", v: (t ? "4" : "9") + " / ≥5", bad: t },
+        { l: "Products", v: (t ? "11" : "26") + " / ≥10" },
+        { l: "Frame broken", v: (t ? "3" : "5") + " / ≥2", sub: "non-original forms searched" },
+        { l: "Gap checklist", v: "7 / 7" },
+        { l: "Product lines from manufacturer pages", v: "4 / 4", sub: "top-tier brands" },
+        { l: "Source coverage", v: "4 of 7 / ≥3", sub: "rows COVERED (LIGHT)" },
+        { l: "Data layers", v: "3 / ≥2", sub: "editorial · experience · primary" }
+      ];
+    }
+    if (step === 2) return [
+      { l: "Scope cross-check", v: "5 / 5", sub: "checked; 1 dropped (not outdoor-rated)" },
+      { l: "≥2 independent sources per product", v: "min 3", sub: "GE 3 · Govee 4 · Twinkly 5 · Hue 3" },
+      { l: "Top-tier brands compared", v: "4 / 4" },
+      { l: "Stress test (steelman)", v: "1 / ≥1" },
+      { l: "Forced tradeoffs", v: "3 / ≥2" }
+    ];
+    return [
+      { l: "Source trail present", v: "22", sub: "19 verified · 3 login-walled · 0 dead" },
+      { l: "Blind spots", v: "4 / ≥2" },
+      { l: "Confidence calibrated", v: S.prelim ? "prelim." : "per claim",
+        sub: S.prelim ? "every claim reads “preliminary read”: census below gate" : "recommended-grade at ≥3 sources; preliminary below" }
+    ];
+  }
+
+  function renderGate(step, opts) {
+    if (gateNode && gateNode.parentNode) gateNode.parentNode.removeChild(gateNode);
+    var checks = gateChecks(step);
+    var titles = ["Scope gate", "Census gate", "Evaluate gate", "Recommend gate"];
+    var html =
+      '<section class="gate" aria-label="' + titles[step] + '">' +
+        '<div class="gate-head"><h3>' + titles[step] + '</h3><span class="gate-state" id="gateState">' + (opts && opts.waiting ? "waiting" : "checking…") + '</span></div>' +
+        '<p class="gate-sub">Checked by the router between steps. Counts, not vibes.</p>' +
+        '<ul class="checks">' + checks.map(function (c) {
+          return '<li class="check" data-bad="' + (c.bad ? 1 : 0) + '"><span class="mark" aria-hidden="true"></span>' +
+            '<span class="lbl">' + c.l + (c.sub ? '<span class="sub">' + c.sub + '</span>' : "") + '</span>' +
+            '<span class="val">' + c.v + '</span></li>';
+        }).join("") + '</ul>' +
+        '<div class="gate-extra"></div>' +
+        (step === 1 ? '<label class="toggle"><input type="checkbox" id="thinToggle"' + (S.thin ? " checked" : "") + '><span>Simulate a thin census: 4 brands</span></label>' : "") +
+        (opts && opts.waiting ? '<p class="gate-foot">' + opts.waiting + '</p>' : "") +
+      '</section>';
+    gateNode = el(html);
+    placeGate();
+    var tg = gateNode.querySelector("#thinToggle");
+    if (tg) tg.addEventListener("change", function () {
+      S.thin = tg.checked; S.prelim = false; S.searchedMore = false; S.done[1] = false;
+      S.evalPhase = "trade"; S.tradeIdx = 0; S.viewer = [null, null, null]; S.challenged = false; S.sweet = "twinkly";
+      S.done[2] = false; S.done[3] = false; S.reached = 1; S.saved = false;
+      go(1, true);
+    });
+  }
+
+  function placeGate() {
+    if (!gateNode) return;
+    var narrow = window.matchMedia("(max-width: 900px)").matches;
+    if (narrow) {
+      var as = $flow.querySelectorAll(".turn-a");
+      var last = as[as.length - 1];
+      if (last && last.nextSibling !== gateNode) last.after(gateNode);
+      else if (!last && gateNode.parentNode !== $flow) $flow.appendChild(gateNode);
+    } else if (gateNode.parentNode !== $aside) {
+      $aside.innerHTML = ""; $aside.appendChild(gateNode);
+    }
+  }
+  window.addEventListener("resize", placeGate);
+
+  function tick(instant, done) {
+    var my = run;
+    var items = gateNode.querySelectorAll(".check");
+    var anyBad = false;
+    var i = 0;
+    function step() {
+      if (my !== run) return;
+      if (i >= items.length) { finish(); return; }
+      var it = items[i++];
+      if (it.getAttribute("data-bad") === "1") { it.classList.add("bad"); anyBad = true; } else it.classList.add("on");
+      if (instant) step(); else later(step, 340);
+    }
+    function finish() {
+      var st = gateNode.querySelector("#gateState");
+      st.textContent = anyBad ? "FAIL" : "PASS";
+      st.className = "gate-state " + (anyBad ? "fail" : "pass");
+      if (anyBad) {
+        gateNode.querySelector(".gate-extra").innerHTML =
+          '<div class="gate-fail reveal">⚠️ GATE FAIL: Census has 4 brands (need ≥5). Options:\n' +
+          'A) Continue with reduced confidence (recommendation will say "preliminary read" not "recommended")\n' +
+          'B) I continue searching to fill the gap</div>';
+      }
+      if (done) { if (instant) done(anyBad); else later(function () { if (my === run) done(anyBad); }, 380); }
+    }
+    if (instant) step(); else later(step, 450);
+  }
+
+  /* ================= stepper ================= */
+  function renderStepper() {
+    $stepper.innerHTML = STEPS.map(function (s, i) {
+      var state = S.done[i] ? "done" : "todo";
+      return '<li><button type="button" class="step-btn" data-i="' + i + '" data-state="' + state + '"' +
+        (i === S.step ? ' aria-current="step"' : "") + '><span class="n">0' + (i + 1) + '</span><span class="t">' + s.title + '</span></button></li>';
+    }).join("");
+    $stepper.querySelectorAll(".step-btn").forEach(function (b) {
+      b.addEventListener("click", function () { go(+b.getAttribute("data-i")); });
+    });
+  }
+
+  /* ================= step: scope ================= */
+  function scopeBody() {
+    return '<div><h3>The brief</h3><dl class="fields">' + SCOPE_FIELDS.map(function (f) {
+      return "<dt>" + f[0] + "</dt><dd>" + f[1] + "</dd>";
+    }).join("") + "</dl></div>";
+  }
+  function renderScope(instant) {
+    var a = turnA("the brief as a field list", scopeBody());
+    $flow.appendChild(a);
+    renderGate(0);
+    tick(instant, function () {
+      var b = turnB("Is this the brief?", [
+        { k: "ok", l: "Confirm the brief" },
+        { k: "adj", l: "Adjust something" }
+      ]);
+      bindChoices(b, {
+        ok: function () { S.done[0] = true; advance(1); },
+        adj: function (_, n) { slotNote(n, "In a real run you say what to change and the brief is rendered again: new information loops back to scope, never forward. The demo keeps this brief."); }
+      });
+      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+    });
+  }
+
+  /* ================= step: census ================= */
+  function censusBody() {
+    var t = S.thin;
+    var brands = BRANDS.map(function (b) {
+      var off = t && THIN_BRANDS.indexOf(b.n) < 0;
+      return off ? "" : '<span class="chip">' + b.n + ' <span class="f">' + b.f + "</span></span>";
+    }).join("");
+    var map = t
+      ? '<p>Only four brands surfaced: <b>GE</b> for plug-and-play strings, <b>Govee</b> and <b>Twinkly</b> for app-controlled strings, <b>Philips Hue Festavia</b> at the premium end. The search converged quickly, which is the warning sign: convergence is not coverage.</p>' +
+        '<p>Projectors, permanent eave lighting and the second-tier smart brands were never reached, so the map below has a hole where one whole form should be.</p>'
+      : '<p>Plug-and-play strings (<b>GE</b>, <b>Brizled</b>) are where most people start: warm white, cheap, and a mechanical timer does the scheduling. App-controlled strings (<b>Govee</b>, <b>Twinkly</b>, <b>Nanoleaf</b>, <b>Philips Hue Festavia</b>) cost two to four times more and let you change scenes and schedules per zone from the phone, with no ladder after setup.</p>' +
+        '<p>Permanent eave lighting ends the yearly setup entirely: <b>Govee Permanent Outdoor</b> as a DIY kit, <b>Trimlight</b> and <b>Jellyfish Lighting</b> professionally installed at up to ~10× your budget. Projectors (<b>BlissLights</b>) are the fastest setup of all but tend to read flat from the street; net lights cover shrubs, not eaves. Hiring a seasonal installer and window candles only are the two ways to not buy strings at all.</p>';
+    var rows = TIERS.map(function (r) {
+      var b = t ? r.thin : r.brands;
+      return "<tr><td class=\"num\">" + esc(r.p) + "</td><td>" + r.form + "</td><td>" + b + "</td><td>" + r.buys + "</td><td>" + r.watch + "</td></tr>";
+    }).join("");
+    var cov = COVERAGE.map(function (c) {
+      var cls = c.st === "COVERED" ? "covered" : c.st === "PARTIAL" ? "partial" : "na";
+      return '<span class="chip">' + c.ch + ' <span class="status ' + cls + '">' + c.st + "</span></span>";
+    }).join("");
+    return (S.searchedMore ? '<p class="note">Option B: two more search rounds ran until nothing new appeared. This is the full census.</p>' : "") +
+      '<div><h3>Market map</h3><div class="prose">' + map + "</div></div>" +
+      '<div><h3>Brands (' + (t ? 4 : 9) + ')</h3><div class="chips">' + brands + "</div></div>" +
+      '<div><h3>Price tiers</h3><div class="table-wrap"><table><thead><tr><th>Tier</th><th>Form</th><th>Brands</th><th>What it buys you</th><th>Watch out</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>" +
+      '<div class="callout"><span class="k">Experience layer · read directly</span><p>Reddit owners report cheap LED strands losing whole sections after one winter. Not one of the SEO “best of” lists read for this census mentions it. That is why the census has a mandatory phase for the platforms where owners write.</p></div>' +
+      '<div><h3>Source coverage, 7 rows</h3><div class="chips">' + cov + "</div></div>";
+  }
+  function renderCensus(instant) {
+    var a = turnA("a conversational market map", censusBody());
+    $flow.appendChild(a);
+    renderGate(1);
+    tick(instant, function (bad) {
+      var b;
+      if (bad) {
+        b = turnB("The census gate failed. How do you want to continue?", [
+          { k: "A", tag: "A", l: "Continue with reduced confidence", s: "the recommendation will say “preliminary read”" },
+          { k: "B", tag: "B", l: "Keep searching to fill the gap", s: "restores the full census" }
+        ], null, true);
+        bindChoices(b, {
+          A: function () { S.prelim = true; S.done[1] = true; advance(2); },
+          B: function () { S.thin = false; S.prelim = false; S.searchedMore = true; go(1, true); }
+        });
+      } else {
+        b = turnB("Does this map match what you want to choose from?", [
+          { k: "ok", l: "Confirm, and drop projectors", s: "the saved run’s answer" },
+          { k: "adj", l: "Adjust the map" }
+        ]);
+        bindChoices(b, {
+          ok: function () { S.done[1] = true; advance(2); },
+          adj: function (_, n) { slotNote(n, "Here the user can exclude tiers or forms. In the saved run they dropped the projector form (“looks flat from the street”) and kept the permanent tier only as a tradeoff."); }
+        });
+      }
+      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+    });
+  }
+
+  /* ================= step: evaluate ================= */
+  function tradeContextBody() {
+    return '<p style="margin:0;max-width:68ch">Three binary tradeoffs, tuned to this job. Each side names what it costs, so the choice reveals what you value rather than what you say you value.</p>' +
+      '<div class="tradeoffs">' + TRADES.map(function (t, i) {
+        return '<div class="trade"><p class="tq">' + (i + 1) + ". " + t.q + '</p><div class="trade-sides">' +
+          "<div><b>A · " + t.a.l + "</b>" + t.a.c + "</div><div><b>B · " + t.b.l + "</b>" + t.b.c + "</div></div></div>";
+      }).join("") + "</div>";
+  }
+  function logBody() {
+    var differs = 0;
+    var rows = TRADES.map(function (t, i) {
+      var runPick = t[t.run].l;
+      var v = S.viewer[i];
+      var you = v ? t[v].l : "—";
+      var diff = v && v !== t.run;
+      if (diff) differs++;
+      return "<tr><td>" + t.q + "</td><td>" + runPick + "</td><td" + (diff ? ' class="differ"' : "") + ">" + you + (diff ? " ≠" : "") + "</td><td>" + t.rev + "</td></tr>";
+    }).join("");
+    return '<div><h3>Tradeoff log</h3><div class="table-wrap"><table><thead><tr><th>Question</th><th>Run chose</th><th>You chose</th><th>Revealed</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+      (differs ? '<p class="note">You picked the other side on ' + differs + " of 3. The demo continues with the saved run’s answers so the data stays consistent; a real run would re-rank the shortlist from yours.</p>" : "") +
+      '<p class="note"><b>Stated vs revealed:</b> the user said “cheapest that looks good”, then chose app control twice. Surfaced to them; they confirmed: “if I’m paying for lights, I want to change them without a ladder.”</p></div>';
+  }
+  function inCensus(brand) { return brand === "*" || !S.thin || THIN_BRANDS.indexOf(brand) >= 0; }
+  function shortlistBody() {
+    var rows = SHORTLIST.map(function (p) {
+      var flag = p.dropped ? '<span class="flag-x">' + p.flag + "</span>" : '<span class="flag-w">' + p.flag + "</span>";
+      return "<tr" + (p.dropped ? ' class="dropped"' : "") + "><td><span>" + p.n + "</span></td><td>" + p.tier + "</td><td>" + p.why + '</td><td class="num">' + (p.src == null ? "—" : p.src) + "</td><td>" + flag + "</td></tr>";
+    }).join("");
+    var filt = FILTERED.filter(function (f) { return inCensus(f.b); }).map(function (f) {
+      return "<tr><td>" + f.n + "</td><td>" + f.why + "</td></tr>";
+    }).join("");
+    return (S.prelim ? '<div class="banner-warn">⚠️ BELOW GATE: the census found 4 brands. Reduced confidence is carried into every step from here.</div>' : "") +
+      '<div><h3>Shortlist and evidence</h3><div class="table-wrap"><table><thead><tr><th>Product</th><th>Tier</th><th>Why it survived</th><th>Sources</th><th>Flag</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>" +
+      logBody() +
+      '<div><h3>Filtered out</h3><div class="table-wrap"><table style="min-width:420px"><thead><tr><th>Product</th><th>Reason</th></tr></thead><tbody>' + filt + "</tbody></table></div></div>" +
+      '<div class="callout"><span class="k">Steelman (LIGHT) · one rejected alternative</span><p>“Hire a seasonal installer for ~$500 a season: zero setup, zero ladder, taken down for you.” <b>Kill criterion:</b> the household will pay a recurring fee above the one-time budget every year. <b>Verdict:</b> killed by the budget, which is one-time and soft at $250; kept as the alternative if ladder work becomes the deal-breaker.</p></div>' +
+      '<p style="margin:0">Lead pick for the sweet spot: <b>Twinkly Strings (outdoor)</b>, two runs. Runner-up: Govee.</p>';
+  }
+  function challengeBody() {
+    return '<p style="margin:0"><b>Position unchanged.</b> Searched 2 more sources on the challenged point (is Twinkly worth the premium over Govee?): one more owner thread from second-season users, one more outdoor-install video. Evidence for both sides:</p>' +
+      '<div class="versus">' +
+        '<div class="side current"><span class="lab">Current pick</span><h4>Twinkly Strings (outdoor)</h4><ul>' +
+          "<li>Second-season owners report fewer dead sections than budget strands (3 threads, +1 new)</li>" +
+          "<li>Per-zone scenes and schedules confirmed on the manufacturer page</li>" +
+          '<li class="against">Against: highest price per metre in the class</li></ul></div>' +
+        '<div class="side"><span class="lab">Runner-up</span><h4>Govee outdoor Christmas String Lights</h4><ul>' +
+          "<li>Lowest price per metre among app-controlled outdoor sets (manufacturer + retailer)</li>" +
+          "<li>App praised for scene setup in video reviews (2 transcripts, +1 new)</li>" +
+          '<li class="against">Against: two threads report sets not rejoining Wi-Fi after a power cut</li></ul></div>' +
+      "</div>" +
+      '<p style="margin:0;color:var(--ink-2)">If price per metre matters more to you than a second winter, Govee is a defensible call. Your decision, on the evidence.</p>';
+  }
+
+  function renderEvaluate(instant) {
+    var waiting = "The gate runs once the shortlist is rendered.";
+    var a1 = turnA("three forced tradeoffs", tradeContextBody());
+    $flow.appendChild(a1);
+    renderGate(2, S.evalPhase === "trade" ? { waiting: waiting } : null);
+
+    if (S.evalPhase === "trade") {
+      askTrade(instant);
+      return;
+    }
+    a1.classList.add("past");
+    showShortlist(true);
+  }
+
+  function askTrade(instant) {
+    var i = S.tradeIdx, t = TRADES[i];
+    var b = turnB(t.q, [
+      { k: "a", tag: "A", l: t.a.l, s: t.a.c },
+      { k: "b", tag: "B", l: t.b.l, s: t.b.c }
+    ], "decision " + (i + 1) + " of 3", true);
+    function pick(k) {
+      S.viewer[i] = k;
+      S.tradeIdx++;
+      b.remove();
+      if (S.tradeIdx < TRADES.length) askTrade(false);
+      else { S.evalPhase = "shortlist"; markPast(); showShortlist(false); }
+    }
+    bindChoices(b, { a: function () { pick("a"); }, b: function () { pick("b"); } });
+    $flow.appendChild(b); placeGate();
+    if (!instant) scrollTo(b);
+  }
+
+  function showShortlist(instant) {
+    var a = turnA("shortlist · tradeoff log · filtered out", shortlistBody());
+    $flow.appendChild(a);
+    renderGate(2);
+    if (!instant) scrollTo(a);
+    tick(instant, function () {
+      if (S.challenged) { a.classList.add("past"); showChallenge(true); return; }
+      var b = turnB("Take this shortlist to the recommendation?", [
+        { k: "ok", l: "Confirm the shortlist" },
+        { k: "ch", l: "Are you sure?", s: "challenge the Twinkly pick" }
+      ]);
+      bindChoices(b, {
+        ok: function () { S.done[2] = true; advance(3); },
+        ch: function () { S.challenged = true; b.remove(); markPast(); showChallenge(false); }
+      });
+      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+    });
+  }
+
+  function showChallenge(instant) {
+    var a = turnA("challenge response: evidence for both sides", challengeBody(), "pick held · 2 sources added");
+    $flow.appendChild(a); placeGate();
+    var b = turnB("Your call, on the evidence:", [
+      { k: "keep", l: "Keep Twinkly Strings" },
+      { k: "switch", l: "Switch the sweet spot to Govee" }
+    ], null, true);
+    bindChoices(b, {
+      keep: function () { S.sweet = "twinkly"; S.done[2] = true; advance(3); },
+      "switch": function () { S.sweet = "govee"; S.done[2] = true; advance(3); }
+    });
+    $flow.appendChild(b); placeGate();
+    if (!instant) scrollTo(a);
+  }
+
+  /* ================= step: recommend ================= */
+  function recommendBody() {
+    var p = S.prelim;
+    var gov = S.sweet === "govee";
+    var conf = function (good) {
+      return p ? "<div><i>preliminary read</i> · census below gate</div>" : good;
+    };
+    var sweetName = gov ? "Govee outdoor Christmas String Lights, two runs" : "Twinkly Strings (outdoor), two runs";
+    var sweetWhy = gov
+      ? "Your call after the challenge: lowest price per metre with per-zone app schedules. Runner-up: Twinkly, for its second-season reports."
+      : "App scenes per zone, schedules replace the timer, the strongest owner reports past a second season.";
+    var tiers =
+      '<div class="tiers">' +
+        '<div class="tier"><span class="tl">💰 Budget · &lt;$50</span><h4>GE Energy Smart warm-white LED strings + outdoor timer</h4><p>Cheapest, no app. Owner threads flag dead sections after a winter on cheap strands: buy one spare strand.</p>' +
+          '<div class="conf">' + conf("<div><i>recommended-grade</i> outdoor rating</div><div><i>preliminary read</i> 3-season durability</div>") + "</div></div>" +
+        '<div class="tier pick"><span class="tl">' + (p ? "Sweet spot" : "⭐ Sweet spot") + ' · $100–200</span><h4>' + sweetName + "</h4><p>" + sweetWhy + "</p>" +
+          '<div class="conf">' + conf("<div><i>recommended-grade</i> brand reliability, outdoor rating (≥3 sources)</div><div><i>preliminary read</i> 3-season durability in sub-zero weather (1–2 sources)</div>") + "</div></div>" +
+        '<div class="tier"><span class="tl">🔥 Premium · $150–300</span><h4>Philips Hue Festavia (outdoor)</h4><p>If colour quality matters more than run length; covers less railing per dollar.</p>' +
+          '<div class="conf">' + conf("<div><i>recommended-grade</i> colour quality</div><div><i>preliminary read</i> cold-weather durability</div>") + "</div></div>" +
+      "</div>";
+
+    var evo = [
+      { c: "first", h: '<span class="quote">“outdoor Christmas lights for the front of my house”</span>' },
+      { h: "<b>Job statement</b> removed the noun; seven forms enumerated, from classic strings to window candles only" },
+      { h: "<b>First-round queries</b> shown and approved, including “christmas lights dead section” and “GFCI tripping lights”" },
+      { h: p ? "<b>Census:</b> 4 brands, 11 products, below the LIGHT gate; user chose A, continue with reduced confidence"
+             : "<b>Census:</b> 9 brands, 26 products, 4 tiers; owners on Reddit report dead sections after one winter" },
+      { h: p ? "<b>Landscape checkpoint:</b> thin map accepted as it stood" : "<b>Landscape checkpoint:</b> projector form dropped; permanent tier kept only as a tradeoff" },
+      { h: "<b>Tradeoffs:</b> said “cheapest”, chose app control twice" },
+      { h: "<b>Scope cross-check</b> dropped Twinkly Candies: not outdoor-rated" },
+      { h: "<b>Steelman</b> of a seasonal installer: killed by the recurring cost" + (S.challenged ? "; <b>challenge</b> answered with 2 more sources, pick held" : "") },
+      { c: "last", h: "<b>Final pick:</b> " + sweetName + (gov ? " (user’s call on the evidence)" : "") }
+    ];
+    var timeline = '<ol class="timeline">' + evo.map(function (e) { return '<li class="' + (e.c || "") + '">' + e.h + "</li>"; }).join("") + "</ol>";
+
+    var cov = COVERAGE.map(function (c) {
+      var cls = c.st === "COVERED" ? "covered" : c.st === "PARTIAL" ? "partial" : "na";
+      return '<tr class="cov-row"' + (c.p ? ' data-p="' + c.p + '"' : "") + "><td>" + c.layer + '</td><td class="num">' + c.ch +
+        '</td><td><span class="status ' + cls + '">' + c.st + "</span>" + (c.p ? '<span class="pchip">' + c.p + "</span>" : "") + "</td><td>" + c.note + "</td></tr>";
+    }).join("");
+
+    var blind =
+      '<p class="derive-line">derived from the PARTIAL rows above</p>' +
+      '<div class="blind">' +
+        '<div class="bs derived" data-p="P1" tabindex="0"><span class="pchip" style="margin:0">P1</span><div><span class="src">from corporate_background · PARTIAL</span><br>Two budget storefront brands could not be traced to a company, so their warranty terms could not be checked. Both were filtered out; a similar listing may appear under a new name next season.</div></div>' +
+        '<div class="bs derived" data-p="P2" tabindex="0"><span class="pchip" style="margin:0">P2</span><div><span class="src">from verified_purchase · PARTIAL</span><br>1–3★ review text not read (login wall). The dead-section pattern comes from Reddit owners, not buyer reviews, and is not a measured failure rate.</div></div>' +
+        '<div class="bs"><span class="chip-s">S1</span><div><span class="src supp">supplementary</span><br>No source tested any set in sub-zero temperatures; durability evidence is owner anecdote across mixed climates.</div></div>' +
+        '<div class="bs"><span class="chip-s">S2</span><div><span class="src supp">supplementary</span><br>GFCI trip reports (moisture in connectors during freeze-thaw) were seen in threads but not counted per product.</div></div>' +
+      "</div>";
+
+    return '<div><p class="verdict' + (p ? " prelim" : "") + '">' + (p ? "⚠️ Preliminary read (coverage insufficient)" : "⭐ Recommended") + "</p>" +
+        '<p style="margin:6px 0 0;color:var(--ink-2);font-size:14px">' + (p ? "The census gate failed and you chose to continue, so no claim on this page may say “recommended”." : "Confidence is calibrated per claim: brand reliability is recommended-grade, multi-season durability is a preliminary read.") + "</p></div>" +
+      '<div><h3>Best per tier</h3>' + tiers + "</div>" +
+      '<p class="note" style="margin:0"><b>Alternative kept from the steelman:</b> a seasonal installer at ~$500 a season, if ladder work becomes the deal-breaker.</p>' +
+      '<div><h3>Evolution trail</h3>' + timeline + "</div>" +
+      '<div><h3>Source coverage</h3><div class="table-wrap"><table><thead><tr><th>Layer</th><th>Channel</th><th>Status</th><th>Note</th></tr></thead><tbody>' + cov + "</tbody></table></div>" +
+        '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3)">Sources 22 · domains 13 · verified 19 · login-walled 3 · dead 0</p></div>' +
+      '<div><h3>What I might have missed</h3>' + blind + "</div>" +
+      '<div><h3>Buying notes</h3><ul class="list-tight">' +
+        "<li>Buy only sets labelled for outdoor use with a recognised safety listing.</li>" +
+        "<li>Plug into a GFCI-protected outdoor outlet; use outdoor-rated cords and keep connectors off the ground.</li>" +
+        "<li>Check how many strands may be connected end to end before planning the eave run.</li>" +
+        "<li>Buy from the brand store or its official marketplace storefront; check whether any app feature sits behind a subscription.</li></ul></div>";
+  }
+
+  function bindLinks(root) {
+    function hl(p, on) {
+      root.querySelectorAll('[data-p="' + p + '"]').forEach(function (n) { n.classList.toggle("hl", on); });
+    }
+    root.querySelectorAll("[data-p]").forEach(function (n) {
+      var p = n.getAttribute("data-p");
+      ["mouseenter", "focus"].forEach(function (e) { n.addEventListener(e, function () { hl(p, true); }); });
+      ["mouseleave", "blur"].forEach(function (e) { n.addEventListener(e, function () { hl(p, false); }); });
+    });
+  }
+
+  function renderRecommend(instant) {
+    var a = turnA("the recommendation", recommendBody());
+    $flow.appendChild(a);
+    bindLinks(a);
+    renderGate(3);
+    tick(instant, function () {
+      var b = turnB("Anything else on this purchase?", [
+        { k: "save", l: "Save the run" },
+        { k: "replay", l: "Replay from Scope" }
+      ]);
+      bindChoices(b, {
+        save: function (_, n) { S.saved = true; S.done[3] = true; renderStepper(); slotNote(n, "In a real run the skill writes this whole page to a Markdown file in its runs folder and updates a brand cache for the next category. It never buys anything. This demo writes nothing."); },
+        replay: function () { replay(); }
+      });
+      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+    });
+  }
+
+  /* ================= navigation ================= */
+  var RENDER = [renderScope, renderCensus, renderEvaluate, renderRecommend];
+
+  function go(i, replayAnim) {
+    if (i < 0 || i > 3) return;
+    run++; clearTimers();
+    S.step = i;
+    if (i > S.reached) S.reached = i;
+    $flow.innerHTML = ""; $aside.innerHTML = ""; gateNode = null;
+    var head = el('<div class="step-title reveal"><h2>' + (i + 1) + ". " + STEPS[i].title + "</h2><p>" + STEPS[i].blurb + "</p></div>");
+    $flow.appendChild(head);
+    renderStepper();
+    var instant = !replayAnim && S.done[i];
+    RENDER[i](instant);
+  }
+  function advance(i) {
+    go(i, true);
+    var wrap = document.querySelector(".stepper-wrap");
+    var sticky = getComputedStyle(wrap).position === "sticky";
+    var y = $flow.getBoundingClientRect().top + window.scrollY - (sticky ? wrap.offsetHeight : 0) - 24;
+    if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
+  }
+  function replay() {
+    S = fresh();
+    advance(0);
+  }
+
+  document.getElementById("replayBtn").addEventListener("click", replay);
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (e.key === "ArrowRight") { e.preventDefault(); go(Math.min(3, S.step + 1)); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); go(Math.max(0, S.step - 1)); }
+  });
+
+  /* ================= theme ================= */
+  var themeBtn = document.getElementById("themeBtn");
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  function effective() {
+    var t = document.documentElement.getAttribute("data-theme");
+    if (t) return t;
+    return mq && mq.matches ? "dark" : "light";
+  }
+  function syncThemeBtn() { themeBtn.textContent = effective() === "dark" ? "Light" : "Dark"; }
+  themeBtn.addEventListener("click", function () {
+    var next = effective() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("shop-demo-theme", next); } catch (err) { /* storage unavailable */ }
+    syncThemeBtn();
+  });
+  try {
+    var saved = localStorage.getItem("shop-demo-theme");
+    if (saved === "light" || saved === "dark") document.documentElement.setAttribute("data-theme", saved);
+  } catch (err) { /* storage unavailable */ }
+  if (mq && mq.addEventListener) mq.addEventListener("change", syncThemeBtn);
+  syncThemeBtn();
+
+  go(0, true);
+})();
+</script>
+</body>
+</html>
