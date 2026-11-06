@@ -12,9 +12,9 @@ run's `source_coverage` table shows you which channels were actually reached.
 ## L0 — skill only
 
 ```bash
-git clone https://github.com/doriru89/shop-skill.git
-./shop-skill/install.sh            # into the current project
-./shop-skill/install.sh --user     # or into ~/.claude/skills for every project
+git clone https://github.com/doriru89/wiseshopper.git
+./wiseshopper/install.sh            # into the current project
+./wiseshopper/install.sh --user     # or into ~/.claude/skills for every project
 ```
 
 Open Claude Code in the project and type `/shop <what you want to buy>`. Claude Code will
@@ -24,7 +24,7 @@ or add the rules from `setup/settings.json` to your `.claude/settings.local.json
 ## L1 — Playwright MCP
 
 ```bash
-./shop-skill/install.sh --browser
+./wiseshopper/install.sh --browser
 ```
 
 That writes two files into the project, only if they do not already exist (otherwise it

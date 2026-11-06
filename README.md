@@ -1,4 +1,4 @@
-# shop — a purchase-decision skill for Claude Code
+# WiseShopper — a purchase-decision skill for Claude Code (`/shop`)
 
 **Finds YOUR best product, not THE best product.**
 
@@ -72,11 +72,11 @@ added because a run went wrong without it.
 ## Quick start
 
 ```bash
-git clone https://github.com/doriru89/shop-skill.git
+git clone https://github.com/doriru89/wiseshopper.git
 ```
 
 ```bash
-./shop-skill/install.sh --browser
+./wiseshopper/install.sh --browser
 ```
 
 Then open Claude Code in the same folder, approve the two MCP servers when it asks, and
@@ -158,8 +158,8 @@ point for its card. Flip the "thin census" switch to see a gate fail and the rec
 downgrade itself to a preliminary read, and press "Are you sure?" to see a challenge
 answered with evidence instead of a flipped pick. Sources and blind spots stay at the
 bottom. The demo is a condensed view: a real run's messages carry the full tables that the
-page folds under "Show the full evidence". Open the file in a browser, or use the hosted
-copy: https://claude.ai/artifact/RWmGQd9uTNnnKES9WhYnMd
+page folds under "Show the full evidence". Open the file in a browser, or the hosted
+copy: https://doriru89.github.io/wiseshopper/demo/shop-workflow.html
 
 ## What each step does
 
