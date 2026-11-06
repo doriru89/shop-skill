@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:*)",
+      "mcp__browser__*",
+      "mcp__browser-headless__*",
+      "Bash(curl -I *)",
+      "Bash(curl -sI *)"
+    ]
+  }
+}

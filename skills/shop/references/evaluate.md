@@ -1,7 +1,7 @@
 # Shop Evaluate — Converge + Verify (v0.2)
 
 > Step of the `shop` skill. Invoked from `SKILL.md`.
-> **Tools for this step:** WebSearch · WebFetch · Read · a browser tool if available · Agent (Step 7 advocates / steelman only) · AskUserQuestion for tradeoffs and confirm
+> **Tools for this step:** WebSearch · WebFetch · Read · the browser MCP servers when configured (`references/browser.md`) · Agent (Step 7 advocates / steelman only) · AskUserQuestion for tradeoffs and confirm
 > Do not request tools beyond this line just because the router has them.
 
 ## Purpose
@@ -57,7 +57,7 @@ Before proceeding to Verify, render ALL of this in the reply body as a markdown 
 For each shortlisted product:
 
 - **Spec verification:** Check the manufacturer site directly. Don't trust review sites' spec tables.
-- **Verified purchase reviews:** Read actual Amazon/retailer reviews (browser tool, or WebFetch). Look for:
+- **Verified purchase reviews:** Read actual Amazon/retailer reviews (`browser`, signed in; WebFetch gives histograms only). Look for:
   - Distribution shape (mostly 5-star with a few 1-star ≠ mostly 3-star)
   - Recurring specific complaints
   - 6+ month reviews (durability signal)

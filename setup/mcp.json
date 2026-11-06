@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "browser": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "${HOME}/.shop-skill/browser-profile",
+        "--output-dir",
+        "${HOME}/.shop-skill/output"
+      ]
+    },
+    "browser-headless": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--headless",
+        "--output-dir",
+        "${HOME}/.shop-skill/output"
+      ]
+    }
+  }
+}

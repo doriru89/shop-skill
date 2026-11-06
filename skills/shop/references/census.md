@@ -1,7 +1,7 @@
 # Shop Census — Exhaustive Market Census (v1.2)
 
 > Step of the `shop` skill. Invoked from `SKILL.md`.
-> **Tools for this step:** WebSearch · WebFetch · Read · Write · Edit (only `shop-runs/brand-cache.yaml`) · Agent (fast-model extraction sub-tasks only, never the conversation) · a browser tool if one is available · AskUserQuestion at the Phase 1 job-statement gate and the Phase 4 checkpoint
+> **Tools for this step:** WebSearch · WebFetch · Read · Write · Edit (only `shop-runs/brand-cache.yaml`) · Agent (fast-model extraction sub-tasks only, never the conversation) · the browser MCP servers when configured (`references/browser.md`) · AskUserQuestion at the Phase 1 job-statement gate and the Phase 4 checkpoint
 > Do not request tools beyond this line just because the router has them.
 
 ## Purpose
@@ -138,9 +138,9 @@ search_log:
 
 | Channel | Tool | What to extract | Skip condition |
 |---------|------|----------------|----------------|
-| **Reddit** | browser tool (or WebFetch of `old.reddit.com` / `.json` endpoints) | Search `r/[category]` for real owner reports: what breaks, what gets ignored, long-term satisfaction | Never skip — Reddit is the highest-signal Experience source |
+| **Reddit** | `browser-headless` on `old.reddit.com` (see `references/browser.md`), or WebFetch of `.json` endpoints | Search `r/[category]` for real owner reports: what breaks, what gets ignored, long-term satisfaction | Never skip — Reddit is the highest-signal Experience source |
 | **YouTube** | WebSearch `"[category] review"` + WebFetch transcript, or `yt-dlp` | Video reviewers with real product demos | Skip if category has no visual demo value |
-| **Amazon verified purchase** | browser tool or WebFetch of the product page, filter "Verified Purchase" | 1-star and 3-star reviews specifically — they reveal what spec sheets hide | Skip if product not on Amazon |
+| **Amazon verified purchase** | `browser` (headed, signed in — L2 in `setup/SETUP.md`); WebFetch gives histograms only → PARTIAL | 1-star and 3-star reviews specifically — they reveal what spec sheets hide | Skip if product not on Amazon |
 
 **Why this is a separate phase, not part of the Search Loop:**
 The Search Loop uses WebSearch (low friction, broad). This phase uses direct platform access (high friction, deep). Mixing them in the loop would slow every round. Instead: the loop finds WHAT exists (brands, products); this phase finds WHETHER it's actually good.
@@ -199,7 +199,7 @@ For each company NOT excluded in Phase 4:
 - Update keyword_map
 
 **5b. Manufacturer site visit:**
-- Go to the manufacturer's ACTUAL product page for the relevant category (browser tool if available, WebFetch otherwise)
+- Go to the manufacturer's ACTUAL product page for the relevant category (`browser-headless` if configured, WebFetch otherwise)
 - NOT "dell workstation release [year]" → open dell.com's workstation listing
 - Extract real product listings and current prices from live pages
 - Inaccessible → use primary retailer (Amazon, B&H, manufacturer's Amazon store) and mark `manufacturer: PARTIAL`

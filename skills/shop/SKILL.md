@@ -33,9 +33,10 @@ Pick by what the user asked for. Read only that file, in **this** conversation.
 |---|---|---|
 | Bare `/shop <thing to buy>` — the whole chain | all four below, in order, one at a time, with the gate + HITL contract between each | union of the rows below |
 | Lock category branch, user profile, stakes (FULL/LIGHT), language, `keyword_map` | `references/scope.md` | Read · AskUserQuestion — no search, no writes |
-| Exhaustive market map: break the frame, parallel sweep + snowball, experience layer, gap checklist, manufacturer-site product lines, brand cache | `references/census.md` | WebSearch · WebFetch · Read · Write · Edit (`shop-runs/brand-cache.yaml` only) · Agent (extraction sub-tasks only) · browser tool if available · AskUserQuestion |
-| Converge via forced tradeoffs → shortlist → evidence cards, scope cross-check, stress test | `references/evaluate.md` | WebSearch · WebFetch · Read · browser tool if available · Agent (per-product advocates on FULL, one steelman on LIGHT) · AskUserQuestion |
+| Exhaustive market map: break the frame, parallel sweep + snowball, experience layer, gap checklist, manufacturer-site product lines, brand cache | `references/census.md` | WebSearch · WebFetch · Read · Write · Edit (`shop-runs/brand-cache.yaml` only) · Agent (extraction sub-tasks only) · `mcp__browser-headless__*` / `mcp__browser__*` when configured (see `references/browser.md`) · AskUserQuestion |
+| Converge via forced tradeoffs → shortlist → evidence cards, scope cross-check, stress test | `references/evaluate.md` | WebSearch · WebFetch · Read · `mcp__browser-headless__*` / `mcp__browser__*` when configured (see `references/browser.md`) · Agent (per-product advocates on FULL, one steelman on LIGHT) · AskUserQuestion |
 | Final per-tier recommendation, evolution trail, source trail, uncertainty, transaction audit, session save | `references/recommend.md` | Read · Bash (URL liveness check) · Write (`shop-runs/<date>-<category>.md` only) |
+| A live page is needed inside census or evaluate | `references/browser.md` (helper, not a step) | the browser servers named in that file |
 
 **Request only the tools that step's row lists.** The `allowed-tools` above is the
 union across steps so the skill can load at all; it is not a licence for scope to
@@ -66,7 +67,7 @@ without them.
 
 | Capability | If you have it | Fallback (always available) |
 |---|---|---|
-| **Browser automation** (Playwright MCP, the desktop app's built-in browser, or any browser tool) | Read Reddit threads, Amazon verified-purchase reviews and manufacturer product pages live | WebFetch only; tag what could not be read `[UNVERIFIED]`; list the gap under uncertainty |
+| **Browser automation** — the two Playwright MCP servers in `setup/mcp.json` (`browser`, `browser-headless`), installed with `install.sh --browser`; any other browser tool also works | Read Reddit threads, Amazon verified-purchase reviews and manufacturer product pages live; `references/browser.md` says which server for which page and how to read without flooding context | WebFetch only; tag what could not be read `[UNVERIFIED]`; list the gap under uncertainty |
 | **A frame-breaking / JTBD reframing skill** | Call it before the census search to expand the category | The census file inlines the procedure: job statement → form enumeration → search cloud |
 | **A source-trail validator** | Call it to check URL liveness and format the trail | The recommend file inlines the procedure: `curl -I` per URL, coverage stats, gap report |
 
@@ -155,7 +156,7 @@ every step (Chinese in → Chinese out, German in → German out).
 | Failure | Degrade |
 |---|---|
 | No frame-breaking skill | Use the inline procedure in `references/census.md` Phase 1 |
-| No browser tool | WebFetch only. Note in uncertainty |
+| No browser MCP connected | WebFetch only. Say so to the user once; note in uncertainty |
 | WebFetch blocked | Tag `[UNVERIFIED]`. Note in uncertainty |
 | Census gate can't be met | Proceed with explicit `⚠️ BELOW GATE` inline; reduce confidence language |
 
