@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shop Skill Walkthrough</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="A guided replay of one synthetic /shop run: scope, census, evaluate and recommend, with the gate checks and the two-turn decision contract.">
+<meta name="description" content="A guided replay of one synthetic /shop run: a price versus effort map narrows as you answer four decisions, from scope to a pick per tier.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,6 +25,16 @@
   --on-accent: #ffffff;
   --warn: #b3261e;
   --warn-soft: #fbeae8;
+  --c-classic: #4f8a6c;
+  --c-classic-f: #e6f1ea;
+  --c-smart: #1d6b4b;
+  --c-smart-f: #cde6d8;
+  --c-proj: #b0711f;
+  --c-proj-f: #f7ecdc;
+  --c-perm: #8a4a12;
+  --c-perm-f: #f0dfcd;
+  --c-svc: #66736d;
+  --c-svc-f: #e7ebe9;
   --shadow: 0 1px 2px rgba(28, 27, 25, .05), 0 4px 16px rgba(28, 27, 25, .04);
   --serif: "Fraunces", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -47,6 +57,16 @@
     --on-accent: #0b1a12;
     --warn: #f08a80;
     --warn-soft: #3a1e1b;
+    --c-classic: #b6dcc6;
+    --c-classic-f: #1b2620;
+    --c-smart: #6fd09a;
+    --c-smart-f: #1d3a2b;
+    --c-proj: #f0c27e;
+    --c-proj-f: #362a19;
+    --c-perm: #e59a55;
+    --c-perm-f: #3b2616;
+    --c-svc: #9aa7a1;
+    --c-svc-f: #232c28;
     --shadow: none;
     color-scheme: dark;
   }
@@ -66,6 +86,16 @@
   --on-accent: #0b1a12;
   --warn: #f08a80;
   --warn-soft: #3a1e1b;
+  --c-classic: #b6dcc6;
+  --c-classic-f: #1b2620;
+  --c-smart: #6fd09a;
+  --c-smart-f: #1d3a2b;
+  --c-proj: #f0c27e;
+  --c-proj-f: #362a19;
+  --c-perm: #e59a55;
+  --c-perm-f: #3b2616;
+  --c-svc: #9aa7a1;
+  --c-svc-f: #232c28;
   --shadow: none;
   color-scheme: dark;
 }
@@ -81,29 +111,35 @@ body {
   line-height: 1.55;
   overflow-x: hidden;
 }
-.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 @media (min-width: 720px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+.ico { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------- header ---------- */
-.top { padding: 40px 0 8px; }
+.top { padding: 36px 0 8px; }
 .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
 h1 { font: 600 clamp(30px, 5vw, 44px)/1.08 var(--serif); letter-spacing: -.01em; margin: 0; }
-.lede { font-size: 17px; color: var(--ink-2); max-width: 62ch; margin: 16px 0 0; }
-.howto { margin: 20px 0 0; padding: 14px 16px; border-left: 2px solid var(--accent); background: var(--surface); color: var(--ink-2); font-size: 15px; max-width: 72ch; border-radius: 0 8px 8px 0; }
-.howto strong { color: var(--ink); font-weight: 600; }
+.lede { font-size: 17px; color: var(--ink-2); max-width: 62ch; margin: 14px 0 0; }
 .top-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .btn {
   font: 500 14px/1 var(--sans); color: var(--ink); background: var(--surface);
   border: 1px solid var(--line-strong); border-radius: 999px; padding: 10px 16px;
-  cursor: pointer; transition: border-color .15s, background .15s, color .15s;
+  cursor: pointer; transition: border-color .15s;
 }
 .btn:hover { border-color: var(--ink-3); }
-.btn:focus-visible, .step-btn:focus-visible, .choice:focus-visible, .chip-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn-ghost { background: transparent; }
+.btn:focus-visible, .step-btn:focus-visible, .choice:focus-visible, .card-x:focus-visible, .bchip:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.progress { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 18px 0 0; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; width: fit-content; max-width: 100%; }
+.pg-total { font: 500 13px/1.3 var(--mono); color: var(--ink); }
+.pg-dots { display: inline-flex; gap: 6px; }
+.pg-dots i { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--line-strong); transition: background .3s, border-color .3s; }
+.pg-dots i.on { background: var(--accent); border-color: var(--accent); }
+.pg-count { font-size: 13px; color: var(--ink-2); }
+.howto { margin: 10px 0 0; font-size: 14px; color: var(--ink-3); }
 
 /* ---------- stepper ---------- */
-.stepper-wrap { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 20px 0 12px; margin-top: 16px; border-bottom: 1px solid var(--line); }
+.stepper-wrap { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 16px 0 10px; margin-top: 14px; border-bottom: 1px solid var(--line); }
 .stepper { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .step-btn {
   width: 100%; text-align: left; background: transparent; border: 0; border-top: 2px solid var(--line);
@@ -115,182 +151,260 @@ h1 { font: 600 clamp(30px, 5vw, 44px)/1.08 var(--serif); letter-spacing: -.01em;
 .step-btn[data-state="done"] { color: var(--ink-2); border-top-color: var(--ink-3); }
 .step-btn[aria-current="step"] { color: var(--ink); border-top-color: var(--accent); }
 .step-btn[aria-current="step"] .n { color: var(--accent); }
-.caption { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); max-width: 90ch; }
+.caption { margin: 8px 0 0; font-size: 12px; color: var(--ink-3); }
 .caption kbd { font: 500 11px/1 var(--mono); border: 1px solid var(--line-strong); border-radius: 4px; padding: 2px 5px; color: var(--ink-2); }
-@media (max-width: 600px) {
-  .stepper-wrap { position: static; }
-}
+@media (max-width: 600px) { .stepper-wrap { position: static; } }
 @media (max-width: 520px) {
   .stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 4px; }
   .top-row { flex-direction: column; }
+  .progress { border-radius: 12px; }
 }
 
 /* ---------- layout ---------- */
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; padding: 32px 0 40px; align-items: start; }
-.flow { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
-.aside { position: sticky; top: 112px; min-width: 0; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 410px); gap: 36px; padding: 28px 0 40px; align-items: start; }
+.flow { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 92px); min-width: 0; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 104px); overflow-y: auto; padding-bottom: 4px; }
 @media (max-width: 900px) {
-  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  .aside { position: static; }
-  .flow > .gate { margin: 0; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 20px; }
+  .aside { position: static; order: -1; max-height: none; overflow: visible; }
 }
-.step-title { margin: 0 0 4px; }
 .step-title h2 { font: 600 28px/1.15 var(--serif); margin: 0; }
-.step-title p { margin: 6px 0 0; color: var(--ink-2); max-width: 64ch; }
+.step-title p { margin: 6px 0 0; color: var(--ink-2); max-width: 64ch; font-size: 15px; }
 
 /* ---------- turns ---------- */
-.turn { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; }
-.turn-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
-.turn-head .who { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
-.turn-head .what { font-weight: 600; font-size: 15px; }
-.turn-head .meta { font-size: 13px; color: var(--ink-3); margin-left: auto; }
-.turn-body { padding: 20px; }
-.turn-body > * + * { margin-top: 20px; }
-.turn-end { display: flex; align-items: center; gap: 12px; padding: 0 20px 16px; font: 400 12px/1 var(--mono); color: var(--ink-3); }
-.turn-end::before, .turn-end::after { content: ""; height: 1px; background: var(--line); flex: 1; }
-.turn.past { opacity: .62; }
-.turn.past .turn-body { max-height: 220px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.turn { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); min-width: 0; padding: 16px 20px 18px; }
+.cap { margin: 0 0 8px; font: 400 11px/1.4 var(--mono); color: var(--ink-3); letter-spacing: .02em; }
+.turn-h { font: 600 21px/1.25 var(--serif); margin: 0 0 12px; }
+.turn-body > * + * { margin-top: 16px; }
+.turn.past { opacity: .6; }
+.turn.past .turn-body { max-height: 150px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 50%, transparent); mask-image: linear-gradient(#000 50%, transparent); }
 .turn-b { border-style: dashed; border-color: var(--line-strong); background: transparent; box-shadow: none; }
-.turn-b .q { margin: 0 0 14px; font-weight: 500; }
+.turn-b .q { margin: 0 0 12px; font-weight: 600; font-size: 17px; }
 .choices { display: flex; flex-wrap: wrap; gap: 10px; }
 .choice {
   font: 500 15px/1.3 var(--sans); text-align: left; cursor: pointer;
   padding: 12px 18px; border-radius: 10px; border: 1px solid var(--line-strong);
   background: var(--surface); color: var(--ink); max-width: 100%;
-  transition: border-color .15s, background .15s;
+  transition: border-color .15s, transform .15s;
 }
 .choice:hover { border-color: var(--ink-3); }
 .choice.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.choice.primary:hover { filter: brightness(1.05); }
 .choice small { display: block; font-weight: 400; font-size: 13px; opacity: .8; margin-top: 3px; }
 .choice-tag { font: 500 12px/1 var(--mono); margin-right: 6px; }
-.note { font-size: 14px; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin: 14px 0 0; }
-.reveal { animation: rise .45s ease both; }
+.note { font-size: 14px; color: var(--ink-2); background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin: 12px 0 0; }
+.reveal { animation: rise .4s ease both; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+details.more { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+details.more summary { cursor: pointer; font: 500 13px/1.4 var(--mono); color: var(--accent-ink); list-style: none; display: inline-flex; gap: 6px; align-items: center; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 4px; font-size: 12px; }
+details.more[open] summary::before { content: "−"; }
+details.more .more-body { margin-top: 14px; }
+details.more .more-body > * + * { margin-top: 16px; }
 
-/* ---------- content atoms ---------- */
-h3 { font: 600 13px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
-.prose p { margin: 0 0 12px; max-width: 68ch; }
-.prose p:last-child { margin-bottom: 0; }
-.fields { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 0; margin: 0; border-top: 1px solid var(--line); }
-.fields dt, .fields dd { padding: 10px 0; border-bottom: 1px solid var(--line); margin: 0; }
-.fields dt { font: 500 13px/1.5 var(--mono); color: var(--ink-3); padding-right: 16px; }
-.fields dd { font-size: 15px; }
-.fields code, .mono { font: 400 13px/1.5 var(--mono); }
-.fields em { font-family: var(--serif); font-style: italic; font-size: 16px; }
-@media (max-width: 600px) {
-  .fields { grid-template-columns: minmax(0, 1fr); }
-  .fields dt { border-bottom: 0; padding-bottom: 0; }
-}
+/* duel: big two-sided tradeoff */
+.pips { display: flex; gap: 6px; margin: 0 0 10px; }
+.pips i { width: 26px; height: 4px; border-radius: 2px; background: var(--line); }
+.pips i.on { background: var(--accent); }
+.duel { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: stretch; }
+.duel .choice { padding: 18px; display: flex; flex-direction: column; gap: 6px; min-height: 120px; }
+.duel .choice b { font: 600 18px/1.25 var(--serif); }
+.duel .choice small { font-size: 14px; opacity: .85; margin: 0; }
+.duel .choice:hover { transform: translateY(-2px); border-color: var(--accent); }
+.duel .or { align-self: center; font: 500 12px/1 var(--mono); color: var(--ink-3); }
+@media (max-width: 560px) { .duel { grid-template-columns: minmax(0, 1fr); } .duel .or { justify-self: center; } .duel .choice { min-height: 0; } }
+
+/* ---------- atoms ---------- */
+h3 { font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 8px; }
+.kv { display: grid; grid-template-columns: 120px minmax(0, 1fr); margin: 0; }
+.kv dt, .kv dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); }
+.kv dt { font: 500 12px/1.6 var(--mono); color: var(--ink-3); padding-right: 12px; }
+.kv dd { font-size: 15px; }
+.kv em { font-family: var(--serif); font-style: italic; }
+.kv code { font: 400 13px/1.5 var(--mono); }
+@media (max-width: 520px) { .kv { grid-template-columns: minmax(0, 1fr); } .kv dd { border-top: 0; padding-top: 0; } }
+.lead { font: 400 18px/1.45 var(--serif); margin: 0; max-width: 60ch; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
-th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
 th { font: 500 12px/1.3 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; background: var(--surface-2); }
 tr:last-child td { border-bottom: 0; }
 td.num { font-family: var(--mono); white-space: nowrap; }
-tr.dropped td { color: var(--ink-3); }
-tr.dropped td:first-child span { text-decoration: line-through; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); white-space: nowrap; }
-.chip .f { color: var(--ink-3); font-size: 12px; }
-.chip.dim { opacity: .4; text-decoration: line-through; }
-.status { font: 500 12px/1 var(--mono); padding: 4px 8px; border-radius: 4px; white-space: nowrap; display: inline-block; }
-.status.covered { color: var(--ink-2); background: var(--surface-2); }
-.status.na { color: var(--ink-3); border: 1px dashed var(--line-strong); }
-.status.partial { color: var(--accent-ink); background: var(--accent-soft); }
-.pchip { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; background: var(--accent); color: var(--on-accent); margin-left: 6px; }
-.callout { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 16px; background: var(--surface-2); }
-.callout .k { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 8px; }
-.callout p { margin: 0; }
-.banner-warn { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--ink); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
-.flag-x { color: var(--warn); font-weight: 600; white-space: nowrap; }
-.flag-w { white-space: nowrap; }
-
-/* ---------- gate panel ---------- */
-.gate { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
-.gate-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-.gate-head h3 { margin: 0; }
-.gate-state { font: 500 12px/1 var(--mono); color: var(--ink-3); }
-.gate-state.pass { color: var(--accent); }
-.gate-state.fail { color: var(--warn); }
-.gate-sub { font-size: 13px; color: var(--ink-3); margin: 0 0 12px; }
-.checks { list-style: none; margin: 0; padding: 0; }
-.check { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14px; }
-.check .mark { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: inline-grid; place-items: center; font-size: 11px; line-height: 1; transform: translateY(2px); }
-.check .val { font: 500 13px/1.4 var(--mono); color: var(--ink-3); text-align: right; white-space: nowrap; }
-.check .lbl { color: var(--ink-3); }
-.check.on .lbl { color: var(--ink); }
-.check.on .val { color: var(--ink-2); }
-.check.on .mark { border-color: var(--ink); background: var(--ink); color: var(--bg); }
-.check.on .mark::after { content: "✓"; }
-.check.bad .mark { border-color: var(--warn); background: var(--warn); color: var(--bg); }
-.check.bad .mark::after { content: "!"; font-weight: 700; }
-.check.bad .val, .check.bad .lbl { color: var(--warn); }
-.check .sub { display: block; font-size: 12px; color: var(--ink-3); margin-top: 2px; }
-.gate-fail { margin-top: 12px; border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 12px; font: 400 13px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
-.toggle { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); cursor: pointer; }
-.toggle input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; }
-.gate-foot { font-size: 12px; color: var(--ink-3); margin: 12px 0 0; }
-
-/* ---------- tradeoffs ---------- */
-.tradeoffs { display: grid; gap: 12px; }
-.trade { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
-.trade .tq { font-weight: 600; margin: 0 0 10px; }
-.trade-sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-.trade-sides div { font-size: 14px; color: var(--ink-2); }
-.trade-sides b { display: block; color: var(--ink); font-weight: 500; margin-bottom: 2px; }
-@media (max-width: 560px) { .trade-sides { grid-template-columns: minmax(0, 1fr); } }
 .differ { color: var(--accent-ink); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bchip { display: inline-flex; align-items: center; gap: 6px; font: 500 13px/1 var(--sans); padding: 6px 10px 6px 7px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.bchip:hover { border-color: var(--ink-3); }
+.bchip svg { width: 16px; height: 16px; color: var(--pc); }
+.callout { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 12px 16px; background: var(--surface-2); }
+.callout .k { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
+.callout p { margin: 0; }
+.banner-warn { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--ink); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.status { font: 500 11px/1 var(--mono); padding: 4px 7px; border-radius: 4px; white-space: nowrap; display: inline-block; }
+.st-ok { color: var(--accent-ink); background: var(--accent-soft); }
+.st-lo { color: var(--ink-2); background: var(--surface-2); }
+.st-x { color: var(--warn); background: var(--warn-soft); }
+.st-pick { color: var(--on-accent); background: var(--accent); }
+.status.covered { color: var(--ink-2); background: var(--surface-2); }
+.status.partial { color: var(--accent-ink); background: var(--accent-soft); }
+.status.na { color: var(--ink-3); border: 1px dashed var(--line-strong); }
+.pchip { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; background: var(--accent); color: var(--on-accent); margin-left: 6px; }
+.chip-s { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line-strong); color: var(--ink-3); }
 
-/* ---------- challenge ---------- */
+/* coverage bar */
+.covbar { display: flex; gap: 4px; }
+.covbar span { flex: 1; height: 16px; border-radius: 4px; border: 1.5px solid var(--accent); }
+.covbar .cv-covered { background: var(--accent); }
+.covbar .cv-partial { background: repeating-linear-gradient(135deg, var(--accent) 0 2px, transparent 2px 6px); }
+.covbar .cv-na { border-style: dashed; border-color: var(--line-strong); }
+.cov-key { display: flex; gap: 14px; margin-top: 6px; font: 400 12px/1 var(--mono); color: var(--ink-3); }
+
+/* product cards (shortlist) */
+.pcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pcard { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 12px; align-items: start; }
+.pcard .pi { grid-row: span 3; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--pf); color: var(--pc); border: 1.5px solid var(--pc); }
+.pcard .pi svg { width: 20px; height: 20px; }
+.pcard .nm { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.pcard .ln { font-size: 13px; color: var(--ink-2); }
+.pcard .fl { font-size: 12px; color: var(--ink-3); }
+.pcard .tierchip { font: 500 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--accent-ink); margin-left: 6px; white-space: nowrap; }
+.pcard.dropped { border-style: dashed; opacity: .7; }
+.pcard.dropped .nm { text-decoration: line-through; color: var(--ink-3); }
+.pcard.dropped .fl { color: var(--warn); }
+@media (max-width: 560px) { .pcards { grid-template-columns: minmax(0, 1fr); } }
+.steel { font-size: 14px; color: var(--ink-2); margin: 0; }
+.steel b { color: var(--ink); }
+
+/* challenge */
 .versus { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-.side { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.side { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
 .side.current { border-color: var(--accent); }
-.side .lab { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.side .lab { font: 500 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
 .side.current .lab { color: var(--accent); }
-.side h4 { font: 600 18px/1.25 var(--serif); margin: 6px 0 10px; }
+.side h4 { font: 600 17px/1.25 var(--serif); margin: 6px 0 8px; }
 .side ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
-.side li + li { margin-top: 6px; }
+.side li + li { margin-top: 5px; }
 .side li.against { color: var(--ink); }
 @media (max-width: 600px) { .versus { grid-template-columns: minmax(0, 1fr); } }
 
-/* ---------- recommend ---------- */
-.verdict { font: 600 24px/1.2 var(--serif); margin: 0; }
+/* recommend */
 .verdict.prelim { color: var(--warn); }
-.tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.tier { border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sub { margin: -6px 0 0; color: var(--ink-2); font-size: 14px; }
+.tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tier { border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tier.pick { border-color: var(--accent); background: var(--accent-soft); }
-.tier .tl { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.tier .ti { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--pf); color: var(--pc); border: 1.5px solid var(--pc); }
+.tier .ti svg { width: 26px; height: 26px; }
+.tier .tl { font: 500 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
 .tier.pick .tl { color: var(--accent-ink); }
-.tier h4 { font: 600 18px/1.25 var(--serif); margin: 0; }
+.tier h4 { font: 600 17px/1.25 var(--serif); margin: 0; }
 .tier p { margin: 0; font-size: 14px; color: var(--ink-2); }
-.conf { font-size: 13px; border-top: 1px solid var(--line); padding-top: 8px; margin-top: auto; color: var(--ink-2); }
-.conf div + div { margin-top: 4px; }
-.conf i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.conf { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); display: grid; gap: 7px; }
+.cbar { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.tier.pick .cbar { background: var(--surface); }
+.cbar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.cbar i.half { width: 50%; background: repeating-linear-gradient(135deg, var(--accent) 0 3px, transparent 3px 6px); }
+.clab { font: 400 11px/1.35 var(--mono); color: var(--ink-2); margin-top: 3px; display: block; }
 @media (max-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr); } }
-.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
-.timeline li { position: relative; padding: 0 0 16px 28px; font-size: 14px; color: var(--ink-2); }
-.timeline li::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: -8px; width: 1px; background: var(--line-strong); }
+.gave { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font: 500 14px/1.4 var(--mono); }
+.gave .g1 { color: var(--ink-2); }
+.gave .arr { color: var(--accent); font-size: 18px; }
+.gave .g2 { color: var(--accent-ink); background: var(--accent-soft); padding: 4px 8px; border-radius: 6px; }
+.bottom { border-top: 1px solid var(--line); padding-top: 14px; }
+.covtab td { padding: 6px 10px; }
+.covtab table { min-width: 0; font-size: 13px; }
+.covtab .lay { color: var(--ink-3); font-size: 12px; }
+.cov-row.hl td { background: var(--accent-soft); }
+.srcline { margin: 8px 0 0; font: 400 12px/1.5 var(--mono); color: var(--ink-3); }
+.blind { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.bs { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: start; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--ink-2); transition: background .15s; }
+.bs.derived { border-left: 3px solid var(--accent); }
+.bs.hl { background: var(--accent-soft); }
+.bs .src { font: 500 11px/1.4 var(--mono); color: var(--accent-ink); display: block; }
+.bs .src.supp { color: var(--ink-3); }
+.bs .pchip { margin: 0; }
+@media (max-width: 600px) { .blind { grid-template-columns: minmax(0, 1fr); } }
+.derive-line { font: 400 12px/1.4 var(--mono); color: var(--accent-ink); margin: 10px 0 6px; }
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li { position: relative; padding: 0 0 12px 24px; font-size: 14px; color: var(--ink-2); }
+.timeline li::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: -6px; width: 1px; background: var(--line-strong); }
 .timeline li:last-child::before { display: none; }
 .timeline li::after { content: ""; position: absolute; left: 0; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--ink-3); }
 .timeline li.first::after, .timeline li.last::after { background: var(--accent); border-color: var(--accent); }
 .timeline li b { color: var(--ink); font-weight: 600; }
-.timeline .quote { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); }
-.cov-row.hl td { background: var(--accent-soft); }
-.blind { display: grid; gap: 10px; }
-.bs { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: start; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); transition: background .15s; }
-.bs.derived { border-left: 3px solid var(--accent); }
-.bs.hl { background: var(--accent-soft); }
-.bs .src { font: 500 12px/1.4 var(--mono); color: var(--accent-ink); }
-.bs .src.supp { color: var(--ink-3); }
-.bs b { color: var(--ink); font-weight: 600; }
-.chip-link { cursor: pointer; border: 0; padding: 0; background: none; font: inherit; color: inherit; }
-.chip-s { font: 600 11px/1 var(--mono); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line-strong); color: var(--ink-3); }
-.derive-line { font: 400 12px/1.4 var(--mono); color: var(--accent-ink); display: flex; align-items: center; gap: 8px; margin: -4px 0 0; }
-.derive-line::before { content: ""; width: 1px; height: 22px; background: var(--accent); margin-left: 14px; }
+.timeline .quote { font-family: var(--serif); font-style: italic; color: var(--ink); }
 .list-tight { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
 .list-tight li + li { margin-top: 4px; }
-.saved { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; }
+
+/* ---------- map ---------- */
+.map-fig { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; box-shadow: var(--shadow); }
+.map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0 2px 4px; }
+.map-title { font: 600 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.map-cap { font-size: 13px; line-height: 1.35; color: var(--ink-2); text-align: right; }
+#map { display: block; width: 100%; height: auto; }
+#map .grid line { stroke: var(--line); stroke-width: 1; }
+#map .axis { stroke: var(--line-strong); stroke-width: 1; }
+#map .tick { font: 400 10px var(--mono); fill: var(--ink-3); }
+#map .axl { font: 500 10.5px var(--sans); fill: var(--ink-2); }
+#map .band { fill: var(--accent); opacity: .12; }
+#map .band-l { font: 500 9.5px var(--mono); fill: var(--accent-ink); }
+#map .box { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 5 4; }
+#map .box-l { font: 600 10px var(--mono); fill: var(--ink); }
+#map .nr { fill: none; stroke: var(--warn); stroke-width: 1.2; stroke-dasharray: 4 4; }
+#map .nr-l { font: 500 9.5px var(--mono); fill: var(--warn); }
+#map .empty-l { font: 400 13px var(--serif); font-style: italic; fill: var(--ink-3); }
+.pt { color: var(--pc); cursor: pointer; transition: opacity .35s; }
+.pt circle.dot { fill: var(--pf); stroke: var(--pc); stroke-width: 1.5; transition: fill .35s, stroke .35s; }
+.pt.hollow circle.dot { fill: var(--surface); stroke-dasharray: 2.6 2.2; }
+.pt.out { opacity: .25; color: var(--ink-3); }
+.pt.out circle.dot { fill: var(--surface-2); stroke: var(--ink-3); }
+.pt.sel circle.dot { stroke-width: 3; }
+.pt .tag { font: 500 9px var(--mono); fill: var(--ink-3); }
+.pt:focus { outline: none; }
+.pt:focus-visible circle.dot { stroke: var(--accent); stroke-width: 3; }
+.fam-classic { --pc: var(--c-classic); --pf: var(--c-classic-f); }
+.fam-smart { --pc: var(--c-smart); --pf: var(--c-smart-f); }
+.fam-proj { --pc: var(--c-proj); --pf: var(--c-proj-f); }
+.fam-perm { --pc: var(--c-perm); --pf: var(--c-perm-f); }
+.fam-svc { --pc: var(--c-svc); --pf: var(--c-svc-f); }
+#map .pl { font: 600 10.5px var(--sans); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+#map .pl.sweet { fill: var(--accent-ink); }
+#map .ring { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+#map .pulse { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: pulse 1.8s ease-out infinite; }
+@keyframes pulse { from { transform: scale(.8); opacity: .9; } to { transform: scale(1.9); opacity: 0; } }
+.legend { list-style: none; margin: 6px 2px 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--ink-2); }
+.legend li { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--pf); border: 1.5px solid var(--pc); }
+.legend i.hol { background: transparent; border: 1.5px dashed var(--ink-3); }
+
+/* product card under the map */
+.card { background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); }
+.card[hidden] { display: none; }
+.card-top { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.card-ico { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--pf); color: var(--pc); border: 1.5px solid var(--pc); }
+.card-ico svg { width: 26px; height: 26px; }
+.card-brand { margin: 0; font: 500 11px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.card h4 { margin: 2px 0 0; font: 600 17px/1.25 var(--serif); }
+.card-x { border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font: 400 18px/1 var(--sans); }
+.card-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
+.card-row .band { font: 500 12px/1 var(--mono); color: var(--ink); margin-left: auto; }
+.card-why { margin: 10px 0 0; font-size: 14px; }
+.card-meta { margin: 8px 0 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 12px; color: var(--ink-3); }
+
+/* gate strip */
+.gstrip { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface); }
+.gs-head { display: flex; justify-content: space-between; gap: 8px; font: 500 12px/1.3 var(--mono); color: var(--ink-2); }
+.gs-state { color: var(--ink-3); }
+.gs-state.pass { color: var(--accent); }
+.gs-state.fail { color: var(--warn); }
+.gs-line { margin: 6px 0 0; font: 400 12px/1.5 var(--mono); color: var(--ink); }
+.gs-line .tok { opacity: .25; transition: opacity .2s; }
+.gs-line .tok.on { opacity: 1; }
+.gs-line .tok.bad { color: var(--warn); font-weight: 500; }
+.gs-line .sep { color: var(--ink-3); }
+.gstrip.fail { border-color: var(--warn); }
+.gate-fail { margin-top: 10px; border: 1px solid var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 10px; font: 400 12px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; flex-shrink: 0; }
 
 footer { border-top: 1px solid var(--line); padding: 24px 0 48px; font-size: 13px; color: var(--ink-3); }
 footer a { color: var(--accent-ink); }
@@ -298,11 +412,22 @@ footer a { color: var(--accent-ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { animation: none; }
+  #map .pulse { animation: none; opacity: 0; }
   * { transition: none !important; }
 }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="f-string" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5Q12 15 22 5"/><path d="M7 8.8V11M12 10v2.2M17 8.8V11"/><circle cx="7" cy="13.6" r="2"/><circle cx="12" cy="14.8" r="2"/><circle cx="17" cy="13.6" r="2"/></g></symbol>
+  <symbol id="f-net" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16"/></g></symbol>
+  <symbol id="f-proj" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="7" height="7" rx="1.5"/><path d="M9 15.5 21 6M9 19.5l12 1.5"/><path d="M14.5 14h.01M17.5 11.5h.01M17 17h.01M20 15h.01" stroke-width="2.6"/></g></symbol>
+  <symbol id="f-smart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4Q7.5 12 13.5 4"/><path d="M4.5 7.2V9M10.5 7.2V9"/><circle cx="4.5" cy="11" r="1.8"/><circle cx="10.5" cy="11" r="1.8"/><rect x="15" y="9" width="7" height="13" rx="1.6"/><path d="M18.5 19h.01" stroke-width="2.4"/></g></symbol>
+  <symbol id="f-perm" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12.5 12 4l9.5 8.5"/><path d="M5.5 11v9h13v-9"/><path d="M6 14.5h.01M9 12h.01M12 9.5h.01M15 12h.01M18 14.5h.01" stroke-width="2.8"/></g></symbol>
+  <symbol id="f-ladder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2 6 22M16 2l2 20M7.6 6h8.8M7.2 10.5h9.6M6.7 15h10.6M6.3 19h11.4"/></g></symbol>
+  <symbol id="f-candle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M10.5 13h3v8h-3z"/><path d="M12 6.5c1.2 1.3 1.3 2.6 0 3.9-1.3-1.3-1.2-2.6 0-3.9z"/></g></symbol>
+</svg>
+
 <header class="wrap top">
   <div class="top-row">
     <div>
@@ -315,19 +440,39 @@ footer a { color: var(--accent-ink); }
       <button class="btn" id="replayBtn" type="button">Replay</button>
     </div>
   </div>
-  <p class="howto"><strong>How to read this demo.</strong> This page replays one synthetic run (outdoor Christmas lights for a two-storey house in a cold climate) exactly as the user would see it, step by step. Click a decision to move on, use the arrow keys to jump between steps, and watch the gate panel count the evidence before each decision is offered.</p>
+  <div class="progress" aria-live="polite">
+    <span class="pg-total">4 decisions · about 3 minutes</span>
+    <span class="pg-dots" id="pgDots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="pg-count" id="pgCount">0 of 4 decisions made</span>
+  </div>
+  <p class="howto">Click a decision to move on. Watch the map narrow.</p>
 </header>
 
 <div class="stepper-wrap">
   <nav class="wrap" aria-label="Workflow steps">
     <ol class="stepper" id="stepper"></ol>
-    <p class="caption">Evidence and decision never share a turn: Turn A renders the evidence in the message body and ends with no tool call; Turn B asks only the decision, because tool output is collapsed in most Claude Code surfaces. <kbd>←</kbd> <kbd>→</kbd> move between steps.</p>
+    <p class="caption">Evidence and decision never share a turn. <kbd>←</kbd> <kbd>→</kbd> move between steps.</p>
   </nav>
 </div>
 
 <main class="wrap layout">
   <div class="flow" id="flow" aria-live="polite"></div>
-  <aside class="aside" id="aside"></aside>
+  <aside class="aside" id="aside" aria-label="Market map">
+    <figure class="map-fig">
+      <figcaption class="map-head"><span class="map-title">The map</span><span class="map-cap" id="mapCap">No search yet</span></figcaption>
+      <div id="mapHost"></div>
+      <ul class="legend">
+        <li class="fam-classic"><i></i>Classic strings</li>
+        <li class="fam-smart"><i></i>Smart strings</li>
+        <li class="fam-proj"><i></i>Projector</li>
+        <li class="fam-perm"><i></i>Permanent</li>
+        <li class="fam-svc"><i></i>Service or none</li>
+        <li><i class="hol"></i>Indoor-only</li>
+      </ul>
+    </figure>
+    <div id="card" class="card" hidden aria-live="polite"></div>
+    <div id="gate"></div>
+  </aside>
 </main>
 
 <footer class="wrap">
@@ -359,17 +504,25 @@ footer a { color: var(--accent-ink); }
     ["Language", "en"],
     ["keyword_map", "Twinkly → “Strings” · Govee → “Christmas String Lights” / “Permanent Outdoor Lights” · Philips Hue → “Festavia” · Nanoleaf → “Essentials Holiday” · GE → “Energy Smart”"]
   ];
+  // the five fields shown above the fold; the full list lives in the details block
+  var SCOPE_SHORT = [
+    ["Request", "“I want outdoor Christmas lights for the front of my house”"],
+    ["Job statement", "<em>Festive from the street for six weeks, after one afternoon of setup.</em>"],
+    ["Stakes", "<b>LIGHT</b>: low cost, some outdoor electrical risk"],
+    ["Budget", "$100–250, soft"],
+    ["User", "Two-storey house, cold climate, no lights yet"]
+  ];
 
   var BRANDS = [
-    { n: "GE", f: "classic strings" },
-    { n: "Brizled", f: "classic strings" },
-    { n: "Govee", f: "smart strings · permanent DIY" },
-    { n: "Twinkly", f: "smart strings" },
-    { n: "Philips Hue", f: "smart strings" },
-    { n: "Nanoleaf", f: "smart strings" },
-    { n: "BlissLights", f: "projector" },
-    { n: "Trimlight", f: "permanent, installed" },
-    { n: "Jellyfish Lighting", f: "permanent, installed" }
+    { n: "GE", f: "classic strings", i: "string", fam: "classic", p: "ge" },
+    { n: "Brizled", f: "classic strings", i: "string", fam: "classic", p: "brizled" },
+    { n: "Govee", f: "smart strings · permanent DIY", i: "smart", fam: "smart", p: "goveeS" },
+    { n: "Twinkly", f: "smart strings", i: "smart", fam: "smart", p: "twinkly" },
+    { n: "Philips Hue", f: "smart strings", i: "smart", fam: "smart", p: "hue" },
+    { n: "Nanoleaf", f: "smart strings", i: "smart", fam: "smart", p: "nano" },
+    { n: "BlissLights", f: "projector", i: "proj", fam: "proj", p: "bliss" },
+    { n: "Trimlight", f: "permanent, installed", i: "perm", fam: "perm", p: "trim" },
+    { n: "Jellyfish Lighting", f: "permanent, installed", i: "perm", fam: "perm", p: "jelly" }
   ];
   var THIN_BRANDS = ["GE", "Govee", "Twinkly", "Philips Hue"];
 
@@ -406,11 +559,11 @@ footer a { color: var(--accent-ink); }
   ];
 
   var SHORTLIST = [
-    { n: "GE Energy Smart warm-white LED strings", tier: "budget", why: "Cheapest outdoor-rated option with long owner history", src: 3, flag: "⚠️ no app control" },
-    { n: "Govee outdoor Christmas String Lights", tier: "sweet spot", why: "Lowest price in the app-controlled class", src: 4, flag: "⚠️ reconnect complaints after power cuts" },
-    { n: "Twinkly Strings (outdoor)", tier: "sweet spot", why: "Strongest owner reports past a second season; per-zone scenes", src: 5, flag: "⚠️ priciest per metre in the class" },
-    { n: "Philips Hue Festavia (outdoor)", tier: "premium", why: "Best-reviewed colour quality among app sets", src: 3, flag: "⚠️ top of budget for the railing length" },
-    { n: "Twinkly Candies", tier: "—", why: "Dropped at scope cross-check", src: null, flag: "❌ not outdoor-rated", dropped: true }
+    { n: "GE Energy Smart warm-white LED strings", tier: "budget", why: "Cheapest outdoor-rated option with long owner history", src: 3, flag: "⚠️ no app control", id: "ge" },
+    { n: "Govee outdoor Christmas String Lights", tier: "sweet spot", why: "Lowest price in the app-controlled class", src: 4, flag: "⚠️ reconnect complaints after power cuts", id: "goveeS" },
+    { n: "Twinkly Strings (outdoor)", tier: "sweet spot", why: "Strongest owner reports past a second season; per-zone scenes", src: 5, flag: "⚠️ priciest per metre in the class", id: "twinkly" },
+    { n: "Philips Hue Festavia (outdoor)", tier: "premium", why: "Best-reviewed colour quality among app sets", src: 3, flag: "⚠️ top of budget for the railing length", id: "hue" },
+    { n: "Twinkly Candies", tier: "—", why: "Dropped at scope cross-check", src: null, flag: "❌ not outdoor-rated", dropped: true, id: "candies" }
   ];
 
   var FILTERED = [
@@ -420,6 +573,38 @@ footer a { color: var(--accent-ink); }
     { n: "Govee Permanent Outdoor Lights", why: "Permanent form; user chose seasonal", b: "Govee" },
     { n: "Nanoleaf Essentials Holiday", why: "Fewer owner reports past one season", b: "Nanoleaf" },
     { n: "Two storefront brands", why: "No traceable company, cross-validated", b: "*" }
+  ];
+
+  /* one point per product on the map: x = ladder time per year (0-10), y = price in USD (log scale) */
+  var PRODUCTS = [
+    { id: "ge", b: "GE", n: "Energy Smart warm-white LED strings", fam: "classic", ico: "string", x: 7, y: 35, dx: 10, band: "<$50", why: "Cheapest outdoor-rated option with long owner history", drop: "No app control. You chose app-controlled.", flag: "⚠️ no app control", src: 3 },
+    { id: "brizled", b: "Brizled", n: "Plug-and-play LED strings", fam: "classic", ico: "string", x: 7, y: 30, dx: -10, band: "<$50", why: "Warm white and cheap; a timer does the scheduling", drop: "No app control. You chose app-controlled.", flag: "⚠️ owners report dead sections after one winter", src: null },
+    { id: "net", b: "Generic", n: "Net lights for shrubs", fam: "classic", ico: "net", x: 6, y: 40, band: "<$50", why: "Covers shrubs fast", drop: "Covers shrubs only. No app control.", flag: "⚠️ shrubs only", src: null },
+    { id: "bliss", b: "BlissLights", n: "Outdoor projector", fam: "proj", ico: "proj", x: 2, y: 60, band: "$50–150", why: "Fastest setup of all", drop: "You excluded projectors: “looks flat from the street”.", flag: "⚠️ reads flat from the street", src: null },
+    { id: "goveeS", b: "Govee", n: "Outdoor Christmas String Lights", fam: "smart", ico: "smart", x: 5, y: 90, dx: 10.5, band: "$50–150", why: "Lowest price in the app-controlled class", drop: "Smart strings left out by your tradeoff answer.", flag: "⚠️ reconnect complaints after power cuts", src: 4 },
+    { id: "nano", b: "Nanoleaf", n: "Essentials Holiday", fam: "smart", ico: "smart", x: 5, y: 110, dx: -10.5, band: "$50–150", why: "App-controlled strings inside the budget", drop: "Fewer owner reports past one season.", flag: "⚠️ thin owner history", src: null },
+    { id: "twinkly", b: "Twinkly", n: "Strings (outdoor)", fam: "smart", ico: "smart", x: 5, y: 150, dx: 10.5, band: "$100–200", why: "Strongest owner reports past a second season; per-zone scenes", drop: "Smart strings left out by your tradeoff answer.", flag: "⚠️ priciest per metre in the class", src: 5 },
+    { id: "candies", b: "Twinkly", n: "Candies", fam: "smart", ico: "smart", x: 5, y: 70, dx: -10.5, hollow: true, band: "$50–150", why: "App-controlled, but indoor-only", drop: "Dropped at scope cross-check: not outdoor-rated.", flag: "❌ not outdoor-rated", src: null },
+    { id: "hue", b: "Philips Hue", n: "Festavia (outdoor)", fam: "smart", ico: "smart", x: 5, y: 220, dx: -10.5, band: "$150–300", why: "Best-reviewed colour quality among app sets", drop: "Smart strings left out by your tradeoff answer.", flag: "⚠️ top of budget for the railing length", src: 3 },
+    { id: "goveeP", b: "Govee", n: "Permanent Outdoor Lights, DIY kit", fam: "perm", ico: "perm", x: 1, y: 350, band: "DIY kit, a few hundred dollars", why: "No ladder ever again; year-round use", drop: "Permanent form. You chose seasonal.", flag: "⚠️ above the budget", src: null },
+    { id: "trim", b: "Trimlight", n: "Permanent eave lighting, installed", fam: "perm", ico: "perm", x: 0, y: 2500, dx: -10, band: "~10× the budget", why: "Installed for you; no ladder ever again", drop: "Permanent install at ~10× the budget.", flag: "⚠️ far outside the budget", src: null },
+    { id: "jelly", b: "Jellyfish Lighting", n: "Permanent eave lighting, installed", fam: "perm", ico: "perm", x: 0, y: 2800, dx: 10, band: "~10× the budget", why: "Installed for you; no ladder ever again", drop: "Permanent install at ~10× the budget.", flag: "⚠️ far outside the budget", src: null },
+    { id: "installer", b: "Seasonal installer", n: "Hired, up and down each season", fam: "svc", ico: "ladder", x: 0, y: 500, tag: "/year", band: "~$500 a season", why: "Zero setup, zero ladder, taken down for you", drop: "A recurring yearly fee above the one-time budget.", flag: "⚠️ recurring cost", src: null },
+    { id: "candles", b: "Non-consumption", n: "Window candles only", fam: "svc", ico: "candle", x: 3, y: 30, band: "<$50", why: "Skip strings entirely", drop: "No app control. You chose app-controlled.", flag: "⚠️ the eave line stays dark", src: null }
+  ];
+  var BY_ID = {};
+  PRODUCTS.forEach(function (p) { BY_ID[p.id] = p; });
+  var THIN_IDS = ["ge", "goveeS", "twinkly", "hue"];
+  // what each tradeoff answer drops from the map
+  var EXCL = [
+    { a: ["goveeS", "nano", "twinkly", "candies", "hue", "bliss"], b: ["ge", "brizled", "net", "candles", "bliss"] },
+    { a: ["goveeP", "trim", "jelly", "installer"], b: ["ge", "brizled", "net", "candles", "goveeS", "nano", "twinkly", "candies", "hue", "installer"] },
+    { a: [], b: [] }
+  ];
+  var CAPS = [
+    { a: "Plug-and-play: the smart strings drop out.", b: "App-controlled: plug-and-play strings, nets, candles and the projector drop out." },
+    { a: "Seasonal: permanent tracks and installers drop out.", b: "Permanent: every seasonal string drops out." },
+    { a: "One run: no points dropped.", b: "Two runs: price shown per run." }
   ];
 
   /* ================= state ================= */
@@ -432,43 +617,45 @@ footer a { color: var(--accent-ink); }
       thin: false, prelim: false, searchedMore: false,
       viewer: [null, null, null], tradeIdx: 0,
       evalPhase: "trade", challenged: false, sweet: "twinkly",
-      notes: {}, saved: false
+      saved: false, card: null
     };
   }
   S = fresh();
-  var run = 0;           // cancels stale timers
+  var run = 0;
   var timers = [];
   function later(fn, ms) { var id = setTimeout(fn, reduce ? 0 : ms); timers.push(id); return id; }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 
   var $flow = document.getElementById("flow");
-  var $aside = document.getElementById("aside");
   var $stepper = document.getElementById("stepper");
+  var $card = document.getElementById("card");
+  var $gate = document.getElementById("gate");
+  var $cap = document.getElementById("mapCap");
 
   /* ================= helpers ================= */
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function el(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+  function icon(id, cls) { return '<svg class="' + (cls || "") + '" viewBox="0 0 24 24" aria-hidden="true"><use href="#f-' + id + '"/></svg>'; }
 
-  function turnA(what, body, meta) {
+  function turnA(title, body, more, cls) {
     return el(
-      '<section class="turn turn-a reveal">' +
-        '<header class="turn-head"><span class="who">Turn A</span><span class="what">' + what + '</span>' +
-        '<span class="meta">' + (meta || "message body") + '</span></header>' +
+      '<section class="turn turn-a reveal' + (cls ? " " + cls : "") + '">' +
+        '<p class="cap">Turn A · message body · turn ends, no tool call</p>' +
+        '<h3 class="turn-h">' + title + '</h3>' +
         '<div class="turn-body">' + body + '</div>' +
-        '<div class="turn-end">turn ends · no tool call</div>' +
+        (more ? '<details class="more"><summary>Show the full evidence</summary><div class="more-body">' + more + '</div></details>' : "") +
       '</section>'
     );
   }
-  function turnB(q, choices, label, neutral) {
+  function turnB(q, choices, neutral, extraCap) {
     var btns = choices.map(function (c, i) {
       return '<button type="button" class="choice' + (i === 0 && !neutral ? " primary" : "") + '" data-k="' + c.k + '">' +
         (c.tag ? '<span class="choice-tag">' + c.tag + '</span>' : "") + c.l + (c.s ? "<small>" + c.s + "</small>" : "") + '</button>';
     }).join("");
     return el(
       '<section class="turn turn-b reveal">' +
-        '<header class="turn-head"><span class="who">Turn B</span><span class="what">' + (label || "the decision") + '</span>' +
-        '<span class="meta">AskUserQuestion · options only</span></header>' +
-        '<div class="turn-body"><p class="q">' + q + '</p><div class="choices">' + btns + '</div><div class="slot"></div></div>' +
+        '<p class="cap">Turn B · AskUserQuestion · options only' + (extraCap ? " · " + extraCap : "") + '</p>' +
+        '<p class="q">' + q + '</p><div class="choices">' + btns + '</div><div class="slot"></div>' +
       '</section>'
     );
   }
@@ -477,9 +664,7 @@ footer a { color: var(--accent-ink); }
       b.addEventListener("click", function () { var h = handlers[b.getAttribute("data-k")]; if (h) h(b, node); });
     });
   }
-  function slotNote(node, html) {
-    var s = node.querySelector(".slot"); s.innerHTML = '<p class="note reveal">' + html + '</p>';
-  }
+  function slotNote(node, html) { node.querySelector(".slot").innerHTML = '<p class="note reveal">' + html + '</p>'; }
   function markPast() { $flow.querySelectorAll(".turn").forEach(function (t) { t.classList.add("past"); }); }
   function scrollTo(node) {
     if (!node) return;
@@ -489,60 +674,225 @@ footer a { color: var(--accent-ink); }
     }
   }
 
-  /* ================= gate panel ================= */
-  var gateNode = null;
-  function gateChecks(step) {
-    if (step === 0) return [
-      { l: "Required fields non-empty", v: "10 / 10" },
-      { l: "Stakes routed", v: "LIGHT", sub: "gates below use ≥5 brands, ≥10 products" }
-    ];
-    if (step === 1) {
-      var t = S.thin;
-      return [
-        { l: "Brands", v: (t ? "4" : "9") + " / ≥5", bad: t },
-        { l: "Products", v: (t ? "11" : "26") + " / ≥10" },
-        { l: "Frame broken", v: (t ? "3" : "5") + " / ≥2", sub: "non-original forms searched" },
-        { l: "Gap checklist", v: "7 / 7" },
-        { l: "Product lines from manufacturer pages", v: "4 / 4", sub: "top-tier brands" },
-        { l: "Source coverage", v: "4 of 7 / ≥3", sub: "rows COVERED (LIGHT)" },
-        { l: "Data layers", v: "3 / ≥2", sub: "editorial · experience · primary" }
-      ];
-    }
-    if (step === 2) return [
-      { l: "Scope cross-check", v: "5 / 5", sub: "checked; 1 dropped (not outdoor-rated)" },
-      { l: "≥2 independent sources per product", v: "min 3", sub: "GE 3 · Govee 4 · Twinkly 5 · Hue 3" },
-      { l: "Top-tier brands compared", v: "4 / 4" },
-      { l: "Stress test (steelman)", v: "1 / ≥1" },
-      { l: "Forced tradeoffs", v: "3 / ≥2" }
-    ];
-    return [
-      { l: "Source trail present", v: "22", sub: "19 verified · 3 login-walled · 0 dead" },
-      { l: "Blind spots", v: "4 / ≥2" },
-      { l: "Confidence calibrated", v: S.prelim ? "prelim." : "per claim",
-        sub: S.prelim ? "every claim reads “preliminary read”: census below gate" : "recommended-grade at ≥3 sources; preliminary below" }
-    ];
+  /* ================= the map ================= */
+  var L = 52, R = 370, T = 30, B = 262;
+  var LMIN = Math.log(20) / Math.LN10, LMAX = Math.log(3000) / Math.LN10;
+  function X(v) { return L + (v + 0.7) / 11.2 * (R - L); }
+  function Y(usd) { return B - (Math.log(usd) / Math.LN10 - LMIN) / (LMAX - LMIN) * (B - T); }
+  function PX(p) { return X(p.x) + (p.dx || 0); }
+  function PY(p) { return Y(p.y); }
+  function f1(n) { return Math.round(n * 10) / 10; }
+  var PR = 9.5;
+
+  function buildMap() {
+    var ticks = [[50, "$50"], [100, "$100"], [250, "$250"], [500, "$500"], [1000, "$1k"], [2500, "$2.5k"]];
+    var grid = ticks.map(function (t) {
+      var y = f1(Y(t[0]));
+      return '<line x1="' + L + '" x2="' + R + '" y1="' + y + '" y2="' + y + '"/>';
+    }).join("");
+    var tl = ticks.map(function (t) {
+      return '<text class="tick" x="' + (L - 6) + '" y="' + f1(Y(t[0]) + 3.5) + '" text-anchor="end">' + t[1] + '</text>';
+    }).join("");
+    var bandY = f1(Y(250)), bandH = f1(Y(100) - Y(250));
+    var pts = PRODUCTS.map(function (p) {
+      return '<g class="pt fam-' + p.fam + (p.hollow ? " hollow" : "") + '" data-id="' + p.id + '" role="button" tabindex="-1" style="display:none" ' +
+        'transform="translate(' + f1(PX(p)) + ' ' + f1(PY(p)) + ')" aria-label="' + esc(p.b + " " + p.n + ", " + p.band + ", ladder time " + p.x + " of 10") + '">' +
+        '<title>' + esc(p.b + " · " + p.n) + '</title>' +
+        '<circle class="dot" r="' + PR + '"/>' +
+        '<use href="#f-' + p.ico + '" x="-6.5" y="-6.5" width="13" height="13"/>' +
+        (p.tag ? '<text class="tag" x="13" y="3">' + p.tag + '</text>' : "") +
+      '</g>';
+    }).join("");
+    var nrX = f1(X(0) - 26), nrY = f1(Y(2800) - 16), nrW = f1(X(1) + 20 - (X(0) - 26)), nrH = f1(Y(350) + 18 - (Y(2800) - 16));
+    return '<svg id="map" viewBox="0 0 380 300" role="group" aria-label="Price against ladder time per year, one point per product">' +
+      '<g class="grid">' + grid + '</g>' +
+      '<rect class="band" x="' + L + '" y="' + bandY + '" width="' + (R - L) + '" height="' + bandH + '"/>' +
+      '<text class="band-l" x="' + (R - 4) + '" y="' + f1(Y(250) + 11) + '" text-anchor="end">Budget $100–250</text>' +
+      '<line class="axis" x1="' + L + '" x2="' + L + '" y1="' + T + '" y2="' + B + '"/>' +
+      '<line class="axis" x1="' + L + '" x2="' + R + '" y1="' + B + '" y2="' + B + '"/>' +
+      tl +
+      '<text class="tick" x="' + f1(X(0)) + '" y="' + (B + 14) + '" text-anchor="middle">0 none</text>' +
+      '<text class="tick" x="' + f1(X(5)) + '" y="' + (B + 14) + '" text-anchor="middle">5</text>' +
+      '<text class="tick" x="' + R + '" y="' + (B + 14) + '" text-anchor="end">10 every strand by hand</text>' +
+      '<text class="axl" x="' + f1(X(5)) + '" y="' + (B + 31) + '" text-anchor="middle">Ladder time per year →</text>' +
+      '<text class="axl" transform="translate(11 ' + f1((T + B) / 2) + ') rotate(-90)" text-anchor="middle">Price, log scale →</text>' +
+      '<text class="empty-l" id="mapEmpty" x="' + f1((L + R) / 2) + '" y="' + f1(Y(45)) + '" text-anchor="middle">No search yet</text>' +
+      '<g id="notReached" style="display:none">' +
+        '<rect class="nr" x="' + nrX + '" y="' + nrY + '" width="' + nrW + '" height="' + nrH + '" rx="10"/>' +
+        '<text class="nr-l" x="' + f1(nrX + nrW / 2) + '" y="' + f1(nrY + nrH / 2) + '" text-anchor="middle">not reached</text>' +
+        '<circle class="nr" cx="' + f1(X(2)) + '" cy="' + f1(Y(60)) + '" r="12"/>' +
+        '<text class="nr-l" x="' + f1(X(2)) + '" y="' + f1(Y(60) + 24) + '" text-anchor="middle">not reached</text>' +
+      '</g>' +
+      '<rect class="box" id="box" rx="10" style="display:none"/>' +
+      '<text class="box-l" id="boxL" style="display:none">Your box</text>' +
+      '<g id="rings"></g>' +
+      '<g id="pts">' + pts + '</g>' +
+      '<g id="plabels"></g>' +
+    '</svg>';
   }
 
-  function renderGate(step, opts) {
-    if (gateNode && gateNode.parentNode) gateNode.parentNode.removeChild(gateNode);
-    var checks = gateChecks(step);
-    var titles = ["Scope gate", "Census gate", "Evaluate gate", "Recommend gate"];
-    var html =
-      '<section class="gate" aria-label="' + titles[step] + '">' +
-        '<div class="gate-head"><h3>' + titles[step] + '</h3><span class="gate-state" id="gateState">' + (opts && opts.waiting ? "waiting" : "checking…") + '</span></div>' +
-        '<p class="gate-sub">Checked by the router between steps. Counts, not vibes.</p>' +
-        '<ul class="checks">' + checks.map(function (c) {
-          return '<li class="check" data-bad="' + (c.bad ? 1 : 0) + '"><span class="mark" aria-hidden="true"></span>' +
-            '<span class="lbl">' + c.l + (c.sub ? '<span class="sub">' + c.sub + '</span>' : "") + '</span>' +
-            '<span class="val">' + c.v + '</span></li>';
-        }).join("") + '</ul>' +
+  function add(set, ids) { ids.forEach(function (id) { set[id] = 1; }); }
+  function mapModel() {
+    var m = { plotted: {}, out: {}, picks: {}, cap: "No search yet", box: false, nr: false, shortlisted: false };
+    var st = S.step;
+    if (st === 0) return m;
+    PRODUCTS.forEach(function (p) { if (!S.thin || THIN_IDS.indexOf(p.id) >= 0) m.plotted[p.id] = 1; });
+    m.nr = S.thin; m.box = true;
+    if (st === 1) {
+      m.cap = S.thin ? "Thin census: 4 brands. Dashed areas were never reached." : "Census: 14 products mapped. Click any point.";
+      return m;
+    }
+    add(m.out, ["bliss"]);
+    var answers = st === 2 ? S.viewer.slice(0, S.tradeIdx) : TRADES.map(function (t) { return t.run; });
+    answers.forEach(function (a, i) { if (a) add(m.out, EXCL[i][a]); });
+    m.shortlisted = st === 3 || S.evalPhase !== "trade";
+    if (m.shortlisted) add(m.out, ["candies", "nano"]);
+    if (st === 2) {
+      if (S.tradeIdx === 0) m.cap = "Answer a tradeoff. The box shrinks to what is left.";
+      else if (S.tradeIdx < 3) m.cap = CAPS[S.tradeIdx - 1][answers[S.tradeIdx - 1]];
+      else m.cap = CAPS[2][answers[2]] + " Candies and Nanoleaf leave at the shortlist.";
+    } else {
+      m.picks.ge = "Budget"; m.picks.hue = "Premium";
+      m.picks[S.sweet === "govee" ? "goveeS" : "twinkly"] = "Your sweet spot";
+      m.cap = S.prelim ? "One pick per tier, as a preliminary read." : "One pick per tier. Your sweet spot pulses.";
+    }
+    return m;
+  }
+
+  var lastModel = null;
+  var boxNow = null, boxRun = 0;
+  function applyBox(b) {
+    var r = document.getElementById("box"), l = document.getElementById("boxL");
+    r.setAttribute("x", f1(b.x)); r.setAttribute("y", f1(b.y));
+    r.setAttribute("width", f1(b.w)); r.setAttribute("height", f1(b.h));
+    l.setAttribute("x", f1(b.x + 4)); l.setAttribute("y", f1(b.y - 4));
+    boxNow = b;
+  }
+  function setBox(b) {
+    var r = document.getElementById("box"), l = document.getElementById("boxL");
+    var my = ++boxRun;
+    if (!b) { r.style.display = "none"; l.style.display = "none"; boxNow = null; return; }
+    r.style.display = ""; l.style.display = "";
+    if (!boxNow || reduce || !window.requestAnimationFrame) { applyBox(b); return; }
+    var from = boxNow, t0 = null;
+    function frame(ts) {
+      if (my !== boxRun) return;
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 520), e = 1 - Math.pow(1 - k, 3);
+      applyBox({ x: from.x + (b.x - from.x) * e, y: from.y + (b.y - from.y) * e, w: from.w + (b.w - from.w) * e, h: from.h + (b.h - from.h) * e });
+      if (k < 1) window.requestAnimationFrame(frame);
+    }
+    window.requestAnimationFrame(frame);
+  }
+
+  function updateMap() {
+    var m = mapModel();
+    lastModel = m;
+    $cap.textContent = m.cap;
+    document.getElementById("mapEmpty").style.display = S.step === 0 ? "" : "none";
+    document.getElementById("notReached").style.display = m.nr ? "" : "none";
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, any = false;
+    document.querySelectorAll("#pts .pt").forEach(function (g) {
+      var id = g.getAttribute("data-id"), p = BY_ID[id];
+      var shown = !!m.plotted[id];
+      g.style.display = shown ? "" : "none";
+      g.setAttribute("tabindex", shown ? "0" : "-1");
+      var out = shown && m.out[id] && !m.picks[id];
+      g.classList.toggle("out", !!out);
+      g.classList.toggle("sel", S.card === id);
+      if (shown && !m.out[id]) {
+        any = true;
+        x0 = Math.min(x0, PX(p)); x1 = Math.max(x1, PX(p));
+        y0 = Math.min(y0, PY(p)); y1 = Math.max(y1, PY(p));
+      }
+    });
+    var pad = PR + 6;
+    setBox(m.box && any ? { x: Math.max(L - 4, x0 - pad), y: Math.max(4, y0 - pad), w: (x1 - x0) + pad * 2, h: (y1 - y0) + pad * 2 } : null);
+
+    var lab = "", rings = "";
+    Object.keys(m.picks).forEach(function (id) {
+      var p = BY_ID[id], x = PX(p), y = PY(p), sweet = m.picks[id] === "Your sweet spot";
+      var left = id === "hue";
+      lab += '<text class="pl' + (sweet ? " sweet" : "") + '" x="' + f1(left ? x - 14 : x + 14) + '" y="' + f1(y + 3.5) + '" text-anchor="' + (left ? "end" : "start") + '">' + m.picks[id] + '</text>';
+      if (sweet) rings += '<circle class="ring" cx="' + f1(x) + '" cy="' + f1(y) + '" r="13"/><circle class="pulse" cx="' + f1(x) + '" cy="' + f1(y) + '" r="13"/>';
+    });
+    document.getElementById("plabels").innerHTML = lab;
+    document.getElementById("rings").innerHTML = rings;
+    renderCard();
+  }
+
+  function statusOf(p, m) {
+    if (p.id === "candies" && m.shortlisted) return ["dropped at scope cross-check", "x"];
+    if (!m.picks[p.id] && m.out[p.id]) return ["filtered out", "x"];
+    if (p.y < 100) return ["below budget", "lo"];
+    return ["in play", "ok"];
+  }
+  function renderCard() {
+    var m = lastModel;
+    if (!S.card || !m || !m.plotted[S.card]) {
+      S.card = null; $card.hidden = true; $card.innerHTML = "";
+      document.querySelectorAll("#pts .pt.sel").forEach(function (g) { g.classList.remove("sel"); });
+      return;
+    }
+    var p = BY_ID[S.card], st = statusOf(p, m), pick = m.picks[p.id];
+    var line = st[1] === "x" ? (p.drop || p.why) : p.why;
+    $card.hidden = false;
+    $card.innerHTML =
+      '<div class="card-top fam-' + p.fam + '"><span class="card-ico">' + icon(p.ico, "ico") + '</span>' +
+        '<div><p class="card-brand">' + esc(p.b) + '</p><h4>' + esc(p.n) + '</h4></div>' +
+        '<button type="button" class="card-x" aria-label="Close the card">×</button></div>' +
+      '<div class="card-row"><span class="status st-' + st[1] + '">' + st[0] + '</span>' +
+        (pick ? '<span class="status st-pick">' + (pick === "Your sweet spot" ? "sweet spot pick" : pick.toLowerCase() + " pick") + '</span>' : "") +
+        '<span class="band">' + esc(p.band) + '</span></div>' +
+      '<p class="card-why">' + esc(line) + '</p>' +
+      '<p class="card-meta"><span>' + esc(p.flag) + '</span><span>' + (p.src != null ? p.src + " sources" : "census listing only") + '</span></p>';
+    $card.querySelector(".card-x").addEventListener("click", function () { toggleCard(null); });
+  }
+  function toggleCard(id) {
+    S.card = (id && S.card !== id) ? id : null;
+    document.querySelectorAll("#pts .pt").forEach(function (g) { g.classList.toggle("sel", g.getAttribute("data-id") === S.card); });
+    renderCard();
+  }
+
+  document.getElementById("mapHost").innerHTML = buildMap();
+  document.querySelectorAll("#pts .pt").forEach(function (g) {
+    var id = g.getAttribute("data-id");
+    g.addEventListener("click", function () { toggleCard(id); });
+    g.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); toggleCard(id); }
+    });
+  });
+
+  /* ================= progress ================= */
+  function decisions() { return [S.done[0], S.done[1], S.tradeIdx >= 3, S.done[2]]; }
+  function renderProgress() {
+    var d = decisions(), n = d.filter(Boolean).length;
+    document.querySelectorAll("#pgDots i").forEach(function (i, k) { i.classList.toggle("on", !!d[k]); });
+    document.getElementById("pgCount").textContent = n + " of 4 decisions made";
+  }
+
+  /* ================= gate strip ================= */
+  function gateSpec(step) {
+    if (step === 0) return { name: "Scope gate", toks: ["10/10 fields", "stakes LIGHT"] };
+    if (step === 1) return S.thin
+      ? { name: "Census gate", toks: ["4 brands", "11 products", "3 forms", "4/7 coverage"], bad: 0 }
+      : { name: "Census gate", toks: ["9 brands", "26 products", "5 forms", "4/7 coverage"] };
+    if (step === 2) return { name: "Evaluate gate", toks: ["5/5 cross-checked", "min 3 sources", "1 steelman", "3 tradeoffs"] };
+    return { name: "Recommend gate", toks: ["22 sources", "4 blind spots", S.prelim ? "preliminary read" : "confidence per claim"] };
+  }
+  function renderGate(step, waiting) {
+    var g = gateSpec(step);
+    var line = waiting
+      ? '<span class="tok on">waiting for the shortlist</span>'
+      : g.toks.map(function (t, i) { return '<span class="tok' + (g.bad === i ? " is-bad" : "") + '">' + t + '</span>'; }).join('<span class="sep"> · </span>');
+    $gate.innerHTML =
+      '<div class="gstrip" aria-label="' + g.name + '">' +
+        '<div class="gs-head"><span>' + g.name + ' · <span class="gs-state" id="gateState">' + (waiting ? "waiting" : "checking") + '</span></span></div>' +
+        '<p class="gs-line">' + line + '</p>' +
         '<div class="gate-extra"></div>' +
         (step === 1 ? '<label class="toggle"><input type="checkbox" id="thinToggle"' + (S.thin ? " checked" : "") + '><span>Simulate a thin census: 4 brands</span></label>' : "") +
-        (opts && opts.waiting ? '<p class="gate-foot">' + opts.waiting + '</p>' : "") +
-      '</section>';
-    gateNode = el(html);
-    placeGate();
-    var tg = gateNode.querySelector("#thinToggle");
+      '</div>';
+    var tg = document.getElementById("thinToggle");
     if (tg) tg.addEventListener("change", function () {
       S.thin = tg.checked; S.prelim = false; S.searchedMore = false; S.done[1] = false;
       S.evalPhase = "trade"; S.tradeIdx = 0; S.viewer = [null, null, null]; S.challenged = false; S.sweet = "twinkly";
@@ -550,46 +900,32 @@ footer a { color: var(--accent-ink); }
       go(1, true);
     });
   }
-
-  function placeGate() {
-    if (!gateNode) return;
-    var narrow = window.matchMedia("(max-width: 900px)").matches;
-    if (narrow) {
-      var as = $flow.querySelectorAll(".turn-a");
-      var last = as[as.length - 1];
-      if (last && last.nextSibling !== gateNode) last.after(gateNode);
-      else if (!last && gateNode.parentNode !== $flow) $flow.appendChild(gateNode);
-    } else if (gateNode.parentNode !== $aside) {
-      $aside.innerHTML = ""; $aside.appendChild(gateNode);
-    }
-  }
-  window.addEventListener("resize", placeGate);
-
   function tick(instant, done) {
     var my = run;
-    var items = gateNode.querySelectorAll(".check");
-    var anyBad = false;
-    var i = 0;
+    var toks = $gate.querySelectorAll(".tok");
+    var bad = false, i = 0;
     function step() {
       if (my !== run) return;
-      if (i >= items.length) { finish(); return; }
-      var it = items[i++];
-      if (it.getAttribute("data-bad") === "1") { it.classList.add("bad"); anyBad = true; } else it.classList.add("on");
-      if (instant) step(); else later(step, 340);
+      if (i >= toks.length) { finish(); return; }
+      var t = toks[i++];
+      t.classList.add("on");
+      if (t.classList.contains("is-bad")) { t.classList.add("bad"); bad = true; }
+      if (instant) step(); else later(step, 200);
     }
     function finish() {
-      var st = gateNode.querySelector("#gateState");
-      st.textContent = anyBad ? "FAIL" : "PASS";
-      st.className = "gate-state " + (anyBad ? "fail" : "pass");
-      if (anyBad) {
-        gateNode.querySelector(".gate-extra").innerHTML =
+      var st = document.getElementById("gateState");
+      st.textContent = bad ? "FAIL" : "PASS";
+      st.className = "gs-state " + (bad ? "fail" : "pass");
+      if (bad) {
+        $gate.querySelector(".gstrip").classList.add("fail");
+        $gate.querySelector(".gate-extra").innerHTML =
           '<div class="gate-fail reveal">⚠️ GATE FAIL: Census has 4 brands (need ≥5). Options:\n' +
           'A) Continue with reduced confidence (recommendation will say "preliminary read" not "recommended")\n' +
           'B) I continue searching to fill the gap</div>';
       }
-      if (done) { if (instant) done(anyBad); else later(function () { if (my === run) done(anyBad); }, 380); }
+      if (done) { if (instant) done(bad); else later(function () { if (my === run) done(bad); }, 200); }
     }
-    if (instant) step(); else later(step, 450);
+    if (instant) step(); else later(step, 150);
   }
 
   /* ================= stepper ================= */
@@ -602,60 +938,71 @@ footer a { color: var(--accent-ink); }
     $stepper.querySelectorAll(".step-btn").forEach(function (b) {
       b.addEventListener("click", function () { go(+b.getAttribute("data-i")); });
     });
+    renderProgress();
   }
 
   /* ================= step: scope ================= */
-  function scopeBody() {
-    return '<div><h3>The brief</h3><dl class="fields">' + SCOPE_FIELDS.map(function (f) {
-      return "<dt>" + f[0] + "</dt><dd>" + f[1] + "</dd>";
-    }).join("") + "</dl></div>";
-  }
+  function kv(rows) { return '<dl class="kv">' + rows.map(function (f) { return "<dt>" + f[0] + "</dt><dd>" + f[1] + "</dd>"; }).join("") + "</dl>"; }
   function renderScope(instant) {
-    var a = turnA("the brief as a field list", scopeBody());
+    var a = turnA("The brief", kv(SCOPE_SHORT), "<div><h3>All ten fields</h3>" + kv(SCOPE_FIELDS) + "</div>");
     $flow.appendChild(a);
     renderGate(0);
     tick(instant, function () {
       var b = turnB("Is this the brief?", [
         { k: "ok", l: "Confirm the brief" },
-        { k: "adj", l: "Adjust something" }
+        { k: "adj", l: "Adjust the brief" }
       ]);
       bindChoices(b, {
         ok: function () { S.done[0] = true; advance(1); },
-        adj: function (_, n) { slotNote(n, "In a real run you say what to change and the brief is rendered again: new information loops back to scope, never forward. The demo keeps this brief."); }
+        adj: function (_, n) { slotNote(n, "In a real run you say what to change and the brief is shown again. New information loops back to scope, never forward. The demo keeps this brief."); }
       });
-      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+      $flow.appendChild(b); if (!instant) scrollTo(b);
     });
   }
 
   /* ================= step: census ================= */
+  function covBar() {
+    return '<div><h3>Source coverage · 4 of 7</h3><div class="covbar" role="img" aria-label="Source coverage: 4 covered, 2 partial, 1 not applicable">' +
+      COVERAGE.map(function (c) {
+        var cls = c.st === "COVERED" ? "cv-covered" : c.st === "PARTIAL" ? "cv-partial" : "cv-na";
+        return '<span class="' + cls + '" title="' + c.ch + ": " + c.st + '"></span>';
+      }).join("") + '</div><div class="cov-key" aria-hidden="true"><span>■ covered</span><span>▨ partial</span><span>□ n/a</span></div></div>';
+  }
   function censusBody() {
     var t = S.thin;
-    var brands = BRANDS.map(function (b) {
-      var off = t && THIN_BRANDS.indexOf(b.n) < 0;
-      return off ? "" : '<span class="chip">' + b.n + ' <span class="f">' + b.f + "</span></span>";
+    var chips = BRANDS.filter(function (b) { return !t || THIN_BRANDS.indexOf(b.n) >= 0; }).map(function (b) {
+      return '<button type="button" class="bchip fam-' + b.fam + '" data-open="' + b.p + '" title="' + esc(b.f) + '">' + icon(b.i, "ico") + b.n + '</button>';
+    }).join("");
+    var lead = t
+      ? "Only four brands surfaced, and the search converged fast. Fast convergence is a warning sign: projectors and permanent tracks were never reached."
+      : "Plug-and-play strings are cheapest, app-controlled strings cost two to four times more, and permanent tracks end the yearly setup at up to ~10× the budget.";
+    return (S.searchedMore ? '<p class="note" style="margin:0">Option B ran two more search rounds until nothing new appeared.</p>' : "") +
+      '<p class="lead">' + lead + '</p>' +
+      '<div><h3>Brands · ' + (t ? 4 : 9) + '</h3><div class="chips">' + chips + '</div></div>' +
+      '<div class="callout"><span class="k">Read directly</span><p>Reddit owners report cheap strands losing whole sections after one winter. No best-of list mentions it.</p></div>' +
+      covBar();
+  }
+  function censusMore() {
+    var t = S.thin;
+    var rows = TIERS.map(function (r) {
+      return '<tr><td class="num">' + esc(r.p) + "</td><td>" + r.form + "</td><td>" + (t ? r.thin : r.brands) + "</td><td>" + r.buys + "</td><td>" + r.watch + "</td></tr>";
     }).join("");
     var map = t
-      ? '<p>Only four brands surfaced: <b>GE</b> for plug-and-play strings, <b>Govee</b> and <b>Twinkly</b> for app-controlled strings, <b>Philips Hue Festavia</b> at the premium end. The search converged quickly, which is the warning sign: convergence is not coverage.</p>' +
-        '<p>Projectors, permanent eave lighting and the second-tier smart brands were never reached, so the map below has a hole where one whole form should be.</p>'
-      : '<p>Plug-and-play strings (<b>GE</b>, <b>Brizled</b>) are where most people start: warm white, cheap, and a mechanical timer does the scheduling. App-controlled strings (<b>Govee</b>, <b>Twinkly</b>, <b>Nanoleaf</b>, <b>Philips Hue Festavia</b>) cost two to four times more and let you change scenes and schedules per zone from the phone, with no ladder after setup.</p>' +
-        '<p>Permanent eave lighting ends the yearly setup entirely: <b>Govee Permanent Outdoor</b> as a DIY kit, <b>Trimlight</b> and <b>Jellyfish Lighting</b> professionally installed at up to ~10× your budget. Projectors (<b>BlissLights</b>) are the fastest setup of all but tend to read flat from the street; net lights cover shrubs, not eaves. Hiring a seasonal installer and window candles only are the two ways to not buy strings at all.</p>';
-    var rows = TIERS.map(function (r) {
-      var b = t ? r.thin : r.brands;
-      return "<tr><td class=\"num\">" + esc(r.p) + "</td><td>" + r.form + "</td><td>" + b + "</td><td>" + r.buys + "</td><td>" + r.watch + "</td></tr>";
-    }).join("");
+      ? "<p>GE for plug-and-play strings, Govee and Twinkly for app-controlled strings, Philips Hue Festavia at the premium end. Projectors, permanent eave lighting and the second-tier smart brands were never reached, so the map has a hole where one whole form should be.</p>"
+      : "<p>Plug-and-play strings (GE, Brizled) are where most people start: warm white, cheap, and a mechanical timer does the scheduling. App-controlled strings (Govee, Twinkly, Nanoleaf, Philips Hue Festavia) let you change scenes and schedules per zone from the phone, with no ladder after setup.</p>" +
+        "<p>Permanent eave lighting ends the yearly setup: Govee Permanent Outdoor as a DIY kit, Trimlight and Jellyfish Lighting professionally installed. Projectors (BlissLights) are the fastest setup of all but tend to read flat from the street; net lights suit shrubs. A seasonal installer and window candles only are the two ways to skip buying strings.</p>";
     var cov = COVERAGE.map(function (c) {
-      var cls = c.st === "COVERED" ? "covered" : c.st === "PARTIAL" ? "partial" : "na";
-      return '<span class="chip">' + c.ch + ' <span class="status ' + cls + '">' + c.st + "</span></span>";
+      return "<li><b>" + c.ch + "</b> · " + c.st + ": " + c.note + "</li>";
     }).join("");
-    return (S.searchedMore ? '<p class="note">Option B: two more search rounds ran until nothing new appeared. This is the full census.</p>' : "") +
-      '<div><h3>Market map</h3><div class="prose">' + map + "</div></div>" +
-      '<div><h3>Brands (' + (t ? 4 : 9) + ')</h3><div class="chips">' + brands + "</div></div>" +
-      '<div><h3>Price tiers</h3><div class="table-wrap"><table><thead><tr><th>Tier</th><th>Form</th><th>Brands</th><th>What it buys you</th><th>Watch out</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>" +
-      '<div class="callout"><span class="k">Experience layer · read directly</span><p>Reddit owners report cheap LED strands losing whole sections after one winter. Not one of the SEO “best of” lists read for this census mentions it. That is why the census has a mandatory phase for the platforms where owners write.</p></div>' +
-      '<div><h3>Source coverage, 7 rows</h3><div class="chips">' + cov + "</div></div>";
+    return '<div><h3>Price tiers</h3><div class="table-wrap"><table><thead><tr><th>Tier</th><th>Form</th><th>Brands</th><th>What it buys you</th><th>Watch out</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>" +
+      '<div><h3>Market map in full</h3><div style="font-size:15px;color:var(--ink-2)">' + map + "</div></div>" +
+      '<div><h3>Source coverage, row by row</h3><ul class="list-tight">' + cov + "</ul></div>";
   }
   function renderCensus(instant) {
-    var a = turnA("a conversational market map", censusBody());
+    var a = turnA(S.thin ? "A thin market map" : "The market map", censusBody(), censusMore());
+    a.querySelectorAll(".bchip").forEach(function (c) {
+      c.addEventListener("click", function () { toggleCard(c.getAttribute("data-open")); });
+    });
     $flow.appendChild(a);
     renderGate(1);
     tick(instant, function (bad) {
@@ -664,65 +1011,59 @@ footer a { color: var(--accent-ink); }
         b = turnB("The census gate failed. How do you want to continue?", [
           { k: "A", tag: "A", l: "Continue with reduced confidence", s: "the recommendation will say “preliminary read”" },
           { k: "B", tag: "B", l: "Keep searching to fill the gap", s: "restores the full census" }
-        ], null, true);
+        ], true);
         bindChoices(b, {
           A: function () { S.prelim = true; S.done[1] = true; advance(2); },
           B: function () { S.thin = false; S.prelim = false; S.searchedMore = true; go(1, true); }
         });
       } else {
         b = turnB("Does this map match what you want to choose from?", [
-          { k: "ok", l: "Confirm, and drop projectors", s: "the saved run’s answer" },
+          { k: "ok", l: "Confirm and drop projectors", s: "the saved run’s answer" },
           { k: "adj", l: "Adjust the map" }
         ]);
         bindChoices(b, {
           ok: function () { S.done[1] = true; advance(2); },
-          adj: function (_, n) { slotNote(n, "Here the user can exclude tiers or forms. In the saved run they dropped the projector form (“looks flat from the street”) and kept the permanent tier only as a tradeoff."); }
+          adj: function (_, n) { slotNote(n, "Here you can exclude tiers or forms. In the saved run the user dropped projectors (“looks flat from the street”) and kept the permanent tier only as a tradeoff."); }
         });
       }
-      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+      $flow.appendChild(b); if (!instant) scrollTo(b);
     });
   }
 
   /* ================= step: evaluate ================= */
-  function tradeContextBody() {
-    return '<p style="margin:0;max-width:68ch">Three binary tradeoffs, tuned to this job. Each side names what it costs, so the choice reveals what you value rather than what you say you value.</p>' +
-      '<div class="tradeoffs">' + TRADES.map(function (t, i) {
-        return '<div class="trade"><p class="tq">' + (i + 1) + ". " + t.q + '</p><div class="trade-sides">' +
-          "<div><b>A · " + t.a.l + "</b>" + t.a.c + "</div><div><b>B · " + t.b.l + "</b>" + t.b.c + "</div></div></div>";
-      }).join("") + "</div>";
-  }
-  function logBody() {
-    var differs = 0;
+  function logTable() {
     var rows = TRADES.map(function (t, i) {
-      var runPick = t[t.run].l;
-      var v = S.viewer[i];
-      var you = v ? t[v].l : "—";
-      var diff = v && v !== t.run;
-      if (diff) differs++;
-      return "<tr><td>" + t.q + "</td><td>" + runPick + "</td><td" + (diff ? ' class="differ"' : "") + ">" + you + (diff ? " ≠" : "") + "</td><td>" + t.rev + "</td></tr>";
+      var v = S.viewer[i], diff = v && v !== t.run;
+      return "<tr><td>" + t.q + "</td><td>" + t[t.run].l + "</td><td" + (diff ? ' class="differ"' : "") + ">" + (v ? t[v].l : "not answered") + (diff ? " ≠" : "") + "</td><td>" + t.rev + "</td></tr>";
     }).join("");
     return '<div><h3>Tradeoff log</h3><div class="table-wrap"><table><thead><tr><th>Question</th><th>Run chose</th><th>You chose</th><th>Revealed</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
-      (differs ? '<p class="note">You picked the other side on ' + differs + " of 3. The demo continues with the saved run’s answers so the data stays consistent; a real run would re-rank the shortlist from yours.</p>" : "") +
       '<p class="note"><b>Stated vs revealed:</b> the user said “cheapest that looks good”, then chose app control twice. Surfaced to them; they confirmed: “if I’m paying for lights, I want to change them without a ladder.”</p></div>';
   }
   function inCensus(brand) { return brand === "*" || !S.thin || THIN_BRANDS.indexOf(brand) >= 0; }
+  function pcard(p) {
+    var prod = BY_ID[p.id];
+    return '<div class="pcard fam-' + prod.fam + (p.dropped ? " dropped" : "") + '"><span class="pi">' + icon(prod.ico, "ico") + '</span>' +
+      '<span class="nm">' + p.n + (p.dropped ? "" : '<span class="tierchip">' + p.tier + '</span>') + '</span>' +
+      '<span class="ln">' + p.why + '</span>' +
+      '<span class="fl">' + p.flag + (p.src != null ? " · " + p.src + " sources" : "") + '</span></div>';
+  }
+  function differs() { var n = 0; TRADES.forEach(function (t, i) { if (S.viewer[i] && S.viewer[i] !== t.run) n++; }); return n; }
   function shortlistBody() {
-    var rows = SHORTLIST.map(function (p) {
-      var flag = p.dropped ? '<span class="flag-x">' + p.flag + "</span>" : '<span class="flag-w">' + p.flag + "</span>";
-      return "<tr" + (p.dropped ? ' class="dropped"' : "") + "><td><span>" + p.n + "</span></td><td>" + p.tier + "</td><td>" + p.why + '</td><td class="num">' + (p.src == null ? "—" : p.src) + "</td><td>" + flag + "</td></tr>";
-    }).join("");
-    var filt = FILTERED.filter(function (f) { return inCensus(f.b); }).map(function (f) {
-      return "<tr><td>" + f.n + "</td><td>" + f.why + "</td></tr>";
-    }).join("");
-    return (S.prelim ? '<div class="banner-warn">⚠️ BELOW GATE: the census found 4 brands. Reduced confidence is carried into every step from here.</div>' : "") +
-      '<div><h3>Shortlist and evidence</h3><div class="table-wrap"><table><thead><tr><th>Product</th><th>Tier</th><th>Why it survived</th><th>Sources</th><th>Flag</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>" +
-      logBody() +
+    var d = differs();
+    return (S.prelim ? '<div class="banner-warn">⚠️ Below gate: the census found 4 brands. Reduced confidence carries into every step from here.</div>' : "") +
+      (d ? '<p class="note" style="margin:0">You picked the other side on ' + d + ' of 3. The map shows your answers; the shortlist follows the saved run’s.</p>' : "") +
+      '<div class="pcards">' + SHORTLIST.map(pcard).join("") + "</div>" +
+      '<p class="steel"><b>Steelman:</b> a seasonal installer at ~$500 a season. Killed by the recurring cost against a one-time budget.</p>';
+  }
+  function shortlistMore() {
+    var filt = FILTERED.filter(function (f) { return inCensus(f.b); }).map(function (f) { return "<tr><td>" + f.n + "</td><td>" + f.why + "</td></tr>"; }).join("");
+    return logTable() +
       '<div><h3>Filtered out</h3><div class="table-wrap"><table style="min-width:420px"><thead><tr><th>Product</th><th>Reason</th></tr></thead><tbody>' + filt + "</tbody></table></div></div>" +
       '<div class="callout"><span class="k">Steelman (LIGHT) · one rejected alternative</span><p>“Hire a seasonal installer for ~$500 a season: zero setup, zero ladder, taken down for you.” <b>Kill criterion:</b> the household will pay a recurring fee above the one-time budget every year. <b>Verdict:</b> killed by the budget, which is one-time and soft at $250; kept as the alternative if ladder work becomes the deal-breaker.</p></div>' +
       '<p style="margin:0">Lead pick for the sweet spot: <b>Twinkly Strings (outdoor)</b>, two runs. Runner-up: Govee.</p>';
   }
   function challengeBody() {
-    return '<p style="margin:0"><b>Position unchanged.</b> Searched 2 more sources on the challenged point (is Twinkly worth the premium over Govee?): one more owner thread from second-season users, one more outdoor-install video. Evidence for both sides:</p>' +
+    return '<p style="margin:0">2 sources added on the challenged point: is Twinkly worth the premium over Govee? One more second-season owner thread, one more outdoor-install video.</p>' +
       '<div class="versus">' +
         '<div class="side current"><span class="lab">Current pick</span><h4>Twinkly Strings (outdoor)</h4><ul>' +
           "<li>Second-season owners report fewer dead sections than budget strands (3 threads, +1 new)</li>" +
@@ -733,43 +1074,47 @@ footer a { color: var(--accent-ink); }
           "<li>App praised for scene setup in video reviews (2 transcripts, +1 new)</li>" +
           '<li class="against">Against: two threads report sets not rejoining Wi-Fi after a power cut</li></ul></div>' +
       "</div>" +
-      '<p style="margin:0;color:var(--ink-2)">If price per metre matters more to you than a second winter, Govee is a defensible call. Your decision, on the evidence.</p>';
+      '<p style="margin:0;color:var(--ink-2);font-size:14px">If price per metre matters more to you than a second winter, Govee is a defensible call.</p>';
   }
 
   function renderEvaluate(instant) {
-    var waiting = "The gate runs once the shortlist is rendered.";
-    var a1 = turnA("three forced tradeoffs", tradeContextBody());
+    var a1 = turnA("Three forced tradeoffs", "<p style=\"margin:0\">Each side names its cost, so your choice shows what you value.</p>");
     $flow.appendChild(a1);
-    renderGate(2, S.evalPhase === "trade" ? { waiting: waiting } : null);
-
     if (S.evalPhase === "trade") {
+      renderGate(2, true);
       askTrade(instant);
       return;
     }
     a1.classList.add("past");
     showShortlist(true);
   }
-
   function askTrade(instant) {
     var i = S.tradeIdx, t = TRADES[i];
-    var b = turnB(t.q, [
-      { k: "a", tag: "A", l: t.a.l, s: t.a.c },
-      { k: "b", tag: "B", l: t.b.l, s: t.b.c }
-    ], "decision " + (i + 1) + " of 3", true);
+    var pips = [0, 1, 2].map(function (k) { return '<i class="' + (k <= i ? "on" : "") + '"></i>'; }).join("");
+    var b = el(
+      '<section class="turn turn-b reveal">' +
+        '<p class="cap">Turn B · AskUserQuestion · options only · tradeoff ' + (i + 1) + ' of 3</p>' +
+        '<div class="pips" aria-hidden="true">' + pips + '</div>' +
+        '<p class="q">' + t.q + '</p>' +
+        '<div class="duel">' +
+          '<button type="button" class="choice" data-k="a"><span class="choice-tag">A</span><b>' + t.a.l + '</b><small>' + t.a.c + '</small></button>' +
+          '<span class="or">or</span>' +
+          '<button type="button" class="choice" data-k="b"><span class="choice-tag">B</span><b>' + t.b.l + '</b><small>' + t.b.c + '</small></button>' +
+        '</div>' +
+      '</section>');
     function pick(k) {
       S.viewer[i] = k;
       S.tradeIdx++;
       b.remove();
-      if (S.tradeIdx < TRADES.length) askTrade(false);
-      else { S.evalPhase = "shortlist"; markPast(); showShortlist(false); }
+      if (S.tradeIdx < TRADES.length) { updateMap(); renderProgress(); askTrade(false); }
+      else { S.evalPhase = "shortlist"; updateMap(); renderProgress(); markPast(); showShortlist(false); }
     }
     bindChoices(b, { a: function () { pick("a"); }, b: function () { pick("b"); } });
-    $flow.appendChild(b); placeGate();
+    $flow.appendChild(b);
     if (!instant) scrollTo(b);
   }
-
   function showShortlist(instant) {
-    var a = turnA("shortlist · tradeoff log · filtered out", shortlistBody());
+    var a = turnA("The shortlist", shortlistBody(), shortlistMore());
     $flow.appendChild(a);
     renderGate(2);
     if (!instant) scrollTo(a);
@@ -777,52 +1122,74 @@ footer a { color: var(--accent-ink); }
       if (S.challenged) { a.classList.add("past"); showChallenge(true); return; }
       var b = turnB("Take this shortlist to the recommendation?", [
         { k: "ok", l: "Confirm the shortlist" },
-        { k: "ch", l: "Are you sure?", s: "challenge the Twinkly pick" }
+        { k: "ch", l: "Ask “Are you sure?”", s: "challenge the Twinkly pick" }
       ]);
       bindChoices(b, {
         ok: function () { S.done[2] = true; advance(3); },
         ch: function () { S.challenged = true; b.remove(); markPast(); showChallenge(false); }
       });
-      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+      $flow.appendChild(b); if (!instant) scrollTo(b);
     });
   }
-
   function showChallenge(instant) {
-    var a = turnA("challenge response: evidence for both sides", challengeBody(), "pick held · 2 sources added");
-    $flow.appendChild(a); placeGate();
+    var a = turnA("Are you sure? Position unchanged.", challengeBody());
+    $flow.appendChild(a);
     var b = turnB("Your call, on the evidence:", [
-      { k: "keep", l: "Keep Twinkly Strings" },
-      { k: "switch", l: "Switch the sweet spot to Govee" }
-    ], null, true);
+      { k: "keep", l: "Keep Twinkly" },
+      { k: "switch", l: "Switch to Govee" }
+    ], true);
     bindChoices(b, {
       keep: function () { S.sweet = "twinkly"; S.done[2] = true; advance(3); },
       "switch": function () { S.sweet = "govee"; S.done[2] = true; advance(3); }
     });
-    $flow.appendChild(b); placeGate();
+    $flow.appendChild(b);
     if (!instant) scrollTo(a);
   }
 
   /* ================= step: recommend ================= */
+  function confRows(rows) {
+    if (S.prelim) return '<div class="conf"><div><div class="cbar"><i class="half"></i></div><span class="clab">Preliminary read · census below gate</span></div></div>';
+    return '<div class="conf">' + rows.map(function (r) {
+      return '<div><div class="cbar"><i' + (r[0] ? ' style="width:100%"' : ' class="half"') + '></i></div><span class="clab">' + (r[0] ? "Recommended-grade" : "Preliminary read") + " · " + r[1] + "</span></div>";
+    }).join("") + "</div>";
+  }
+  function tierCard(cls, label, prod, name, line, rows) {
+    var p = BY_ID[prod];
+    return '<div class="tier fam-' + p.fam + (cls ? " " + cls : "") + '"><span class="ti">' + icon(p.ico, "ico") + '</span>' +
+      '<span class="tl">' + label + '</span><h4>' + name + '</h4><p>' + line + '</p>' + confRows(rows) + "</div>";
+  }
   function recommendBody() {
-    var p = S.prelim;
-    var gov = S.sweet === "govee";
-    var conf = function (good) {
-      return p ? "<div><i>preliminary read</i> · census below gate</div>" : good;
-    };
+    var p = S.prelim, gov = S.sweet === "govee";
     var sweetName = gov ? "Govee outdoor Christmas String Lights, two runs" : "Twinkly Strings (outdoor), two runs";
     var sweetWhy = gov
-      ? "Your call after the challenge: lowest price per metre with per-zone app schedules. Runner-up: Twinkly, for its second-season reports."
-      : "App scenes per zone, schedules replace the timer, the strongest owner reports past a second season.";
-    var tiers =
-      '<div class="tiers">' +
-        '<div class="tier"><span class="tl">💰 Budget · &lt;$50</span><h4>GE Energy Smart warm-white LED strings + outdoor timer</h4><p>Cheapest, no app. Owner threads flag dead sections after a winter on cheap strands: buy one spare strand.</p>' +
-          '<div class="conf">' + conf("<div><i>recommended-grade</i> outdoor rating</div><div><i>preliminary read</i> 3-season durability</div>") + "</div></div>" +
-        '<div class="tier pick"><span class="tl">' + (p ? "Sweet spot" : "⭐ Sweet spot") + ' · $100–200</span><h4>' + sweetName + "</h4><p>" + sweetWhy + "</p>" +
-          '<div class="conf">' + conf("<div><i>recommended-grade</i> brand reliability, outdoor rating (≥3 sources)</div><div><i>preliminary read</i> 3-season durability in sub-zero weather (1–2 sources)</div>") + "</div></div>" +
-        '<div class="tier"><span class="tl">🔥 Premium · $150–300</span><h4>Philips Hue Festavia (outdoor)</h4><p>If colour quality matters more than run length; covers less railing per dollar.</p>' +
-          '<div class="conf">' + conf("<div><i>recommended-grade</i> colour quality</div><div><i>preliminary read</i> cold-weather durability</div>") + "</div></div>" +
+      ? "Your call after the challenge: lowest price per metre with per-zone app schedules."
+      : "App scenes per zone, schedules replace the timer, strongest second-season reports.";
+    var tiers = '<div class="tiers">' +
+      tierCard("", "💰 Budget · &lt;$50", "ge", "GE Energy Smart warm-white LED strings + outdoor timer", "Cheapest, no app. Buy one spare strand.", [[1, "outdoor rating"], [0, "3-season durability"]]) +
+      tierCard("pick", (p ? "Sweet spot" : "⭐ Sweet spot") + " · $100–200", gov ? "goveeS" : "twinkly", sweetName, sweetWhy, [[1, "brand reliability, outdoor rating (≥3 sources)"], [0, "3-season durability in sub-zero weather (1–2 sources)"]]) +
+      tierCard("", "🔥 Premium · $150–300", "hue", "Philips Hue Festavia (outdoor)", "If colour quality matters more than run length.", [[1, "colour quality"], [0, "cold-weather durability"]]) +
       "</div>";
-
+    var cov = COVERAGE.map(function (c) {
+      var cls = c.st === "COVERED" ? "covered" : c.st === "PARTIAL" ? "partial" : "na";
+      return '<tr class="cov-row"' + (c.p ? ' data-p="' + c.p + '" tabindex="0"' : "") + ' title="' + esc(c.note) + '"><td class="lay">' + c.layer + '</td><td class="num">' + c.ch +
+        '</td><td><span class="status ' + cls + '">' + c.st + "</span>" + (c.p ? '<span class="pchip">' + c.p + "</span>" : "") + "</td></tr>";
+    }).join("");
+    var blind = '<p class="derive-line">↓ P1 and P2 are derived from the PARTIAL rows above</p><div class="blind">' +
+      '<div class="bs derived" data-p="P1" tabindex="0"><span class="pchip">P1</span><div><span class="src">corporate_background · PARTIAL</span>Two budget storefront brands could not be traced to a company, so their warranty terms could not be checked. Both were filtered out; a similar listing may appear under a new name next season.</div></div>' +
+      '<div class="bs derived" data-p="P2" tabindex="0"><span class="pchip">P2</span><div><span class="src">verified_purchase · PARTIAL</span>1–3★ review text not read (login wall). The dead-section pattern comes from Reddit owners, not buyer reviews, and is not a measured failure rate.</div></div>' +
+      '<div class="bs"><span class="chip-s">S1</span><div><span class="src supp">supplementary</span>No source tested any set in sub-zero temperatures; durability evidence is owner anecdote across mixed climates.</div></div>' +
+      '<div class="bs"><span class="chip-s">S2</span><div><span class="src supp">supplementary</span>GFCI trip reports (moisture in connectors during freeze-thaw) were seen in threads but not counted per product.</div></div>' +
+      "</div>";
+    return '<p class="sub">' + (p ? "The census gate failed and you chose to continue, so nothing here says “recommended”." : "Confidence is calibrated per claim.") + "</p>" +
+      tiers +
+      '<p class="gave"><span class="g1">4 decisions · about 3 minutes</span><span class="arr" aria-hidden="true">→</span><span class="g2">a pick per tier, calibrated</span></p>' +
+      '<div class="bottom"><h3>What was reached</h3><div class="table-wrap covtab"><table><tbody>' + cov + "</tbody></table></div>" +
+        '<p class="srcline">Sources 22 · domains 13 · verified 19 · login-walled 3 · dead 0</p>' +
+        '<h3 style="margin-top:16px">What I might have missed</h3>' + blind + "</div>";
+  }
+  function recommendMore() {
+    var p = S.prelim, gov = S.sweet === "govee";
+    var sweetName = gov ? "Govee outdoor Christmas String Lights, two runs" : "Twinkly Strings (outdoor), two runs";
     var evo = [
       { c: "first", h: '<span class="quote">“outdoor Christmas lights for the front of my house”</span>' },
       { h: "<b>Job statement</b> removed the noun; seven forms enumerated, from classic strings to window candles only" },
@@ -835,51 +1202,25 @@ footer a { color: var(--accent-ink); }
       { h: "<b>Steelman</b> of a seasonal installer: killed by the recurring cost" + (S.challenged ? "; <b>challenge</b> answered with 2 more sources, pick held" : "") },
       { c: "last", h: "<b>Final pick:</b> " + sweetName + (gov ? " (user’s call on the evidence)" : "") }
     ];
-    var timeline = '<ol class="timeline">' + evo.map(function (e) { return '<li class="' + (e.c || "") + '">' + e.h + "</li>"; }).join("") + "</ol>";
-
-    var cov = COVERAGE.map(function (c) {
-      var cls = c.st === "COVERED" ? "covered" : c.st === "PARTIAL" ? "partial" : "na";
-      return '<tr class="cov-row"' + (c.p ? ' data-p="' + c.p + '"' : "") + "><td>" + c.layer + '</td><td class="num">' + c.ch +
-        '</td><td><span class="status ' + cls + '">' + c.st + "</span>" + (c.p ? '<span class="pchip">' + c.p + "</span>" : "") + "</td><td>" + c.note + "</td></tr>";
-    }).join("");
-
-    var blind =
-      '<p class="derive-line">derived from the PARTIAL rows above</p>' +
-      '<div class="blind">' +
-        '<div class="bs derived" data-p="P1" tabindex="0"><span class="pchip" style="margin:0">P1</span><div><span class="src">from corporate_background · PARTIAL</span><br>Two budget storefront brands could not be traced to a company, so their warranty terms could not be checked. Both were filtered out; a similar listing may appear under a new name next season.</div></div>' +
-        '<div class="bs derived" data-p="P2" tabindex="0"><span class="pchip" style="margin:0">P2</span><div><span class="src">from verified_purchase · PARTIAL</span><br>1–3★ review text not read (login wall). The dead-section pattern comes from Reddit owners, not buyer reviews, and is not a measured failure rate.</div></div>' +
-        '<div class="bs"><span class="chip-s">S1</span><div><span class="src supp">supplementary</span><br>No source tested any set in sub-zero temperatures; durability evidence is owner anecdote across mixed climates.</div></div>' +
-        '<div class="bs"><span class="chip-s">S2</span><div><span class="src supp">supplementary</span><br>GFCI trip reports (moisture in connectors during freeze-thaw) were seen in threads but not counted per product.</div></div>' +
-      "</div>";
-
-    return '<div><p class="verdict' + (p ? " prelim" : "") + '">' + (p ? "⚠️ Preliminary read (coverage insufficient)" : "⭐ Recommended") + "</p>" +
-        '<p style="margin:6px 0 0;color:var(--ink-2);font-size:14px">' + (p ? "The census gate failed and you chose to continue, so no claim on this page may say “recommended”." : "Confidence is calibrated per claim: brand reliability is recommended-grade, multi-season durability is a preliminary read.") + "</p></div>" +
-      '<div><h3>Best per tier</h3>' + tiers + "</div>" +
+    return '<div><h3>Evolution trail</h3><ol class="timeline">' + evo.map(function (e) { return '<li class="' + (e.c || "") + '">' + e.h + "</li>"; }).join("") + "</ol></div>" +
       '<p class="note" style="margin:0"><b>Alternative kept from the steelman:</b> a seasonal installer at ~$500 a season, if ladder work becomes the deal-breaker.</p>' +
-      '<div><h3>Evolution trail</h3>' + timeline + "</div>" +
-      '<div><h3>Source coverage</h3><div class="table-wrap"><table><thead><tr><th>Layer</th><th>Channel</th><th>Status</th><th>Note</th></tr></thead><tbody>' + cov + "</tbody></table></div>" +
-        '<p style="margin:8px 0 0;font-size:13px;color:var(--ink-3)">Sources 22 · domains 13 · verified 19 · login-walled 3 · dead 0</p></div>' +
-      '<div><h3>What I might have missed</h3>' + blind + "</div>" +
       '<div><h3>Buying notes</h3><ul class="list-tight">' +
         "<li>Buy only sets labelled for outdoor use with a recognised safety listing.</li>" +
         "<li>Plug into a GFCI-protected outdoor outlet; use outdoor-rated cords and keep connectors off the ground.</li>" +
         "<li>Check how many strands may be connected end to end before planning the eave run.</li>" +
         "<li>Buy from the brand store or its official marketplace storefront; check whether any app feature sits behind a subscription.</li></ul></div>";
   }
-
   function bindLinks(root) {
-    function hl(p, on) {
-      root.querySelectorAll('[data-p="' + p + '"]').forEach(function (n) { n.classList.toggle("hl", on); });
-    }
+    function hl(p, on) { root.querySelectorAll('[data-p="' + p + '"]').forEach(function (n) { n.classList.toggle("hl", on); }); }
     root.querySelectorAll("[data-p]").forEach(function (n) {
       var p = n.getAttribute("data-p");
       ["mouseenter", "focus"].forEach(function (e) { n.addEventListener(e, function () { hl(p, true); }); });
       ["mouseleave", "blur"].forEach(function (e) { n.addEventListener(e, function () { hl(p, false); }); });
     });
   }
-
   function renderRecommend(instant) {
-    var a = turnA("the recommendation", recommendBody());
+    var title = S.prelim ? '<span class="verdict prelim">⚠️ Preliminary read (coverage insufficient)</span>' : '<span class="verdict">Recommended: one pick per tier</span>';
+    var a = turnA(title, recommendBody(), recommendMore());
     $flow.appendChild(a);
     bindLinks(a);
     renderGate(3);
@@ -889,42 +1230,39 @@ footer a { color: var(--accent-ink); }
         { k: "replay", l: "Replay from Scope" }
       ]);
       bindChoices(b, {
-        save: function (_, n) { S.saved = true; S.done[3] = true; renderStepper(); slotNote(n, "In a real run the skill writes this whole page to a Markdown file in its runs folder and updates a brand cache for the next category. It never buys anything. This demo writes nothing."); },
+        save: function (_, n) { S.saved = true; S.done[3] = true; renderStepper(); slotNote(n, "In a real run the skill writes this page to a Markdown file in its runs folder and updates a brand cache for the next category. It never buys anything. This demo writes nothing."); },
         replay: function () { replay(); }
       });
-      $flow.appendChild(b); placeGate(); if (!instant) scrollTo(b);
+      $flow.appendChild(b); if (!instant) scrollTo(b);
     });
   }
 
   /* ================= navigation ================= */
   var RENDER = [renderScope, renderCensus, renderEvaluate, renderRecommend];
-
   function go(i, replayAnim) {
     if (i < 0 || i > 3) return;
     run++; clearTimers();
     S.step = i;
     if (i > S.reached) S.reached = i;
-    $flow.innerHTML = ""; $aside.innerHTML = ""; gateNode = null;
-    var head = el('<div class="step-title reveal"><h2>' + (i + 1) + ". " + STEPS[i].title + "</h2><p>" + STEPS[i].blurb + "</p></div>");
-    $flow.appendChild(head);
+    $flow.innerHTML = ""; $gate.innerHTML = "";
+    $flow.appendChild(el('<div class="step-title reveal"><h2>' + (i + 1) + ". " + STEPS[i].title + "</h2><p>" + STEPS[i].blurb + "</p></div>"));
     renderStepper();
-    var instant = !replayAnim && S.done[i];
-    RENDER[i](instant);
+    updateMap();
+    RENDER[i](!replayAnim && S.done[i]);
   }
   function advance(i) {
     go(i, true);
     var wrap = document.querySelector(".stepper-wrap");
     var sticky = getComputedStyle(wrap).position === "sticky";
-    var y = $flow.getBoundingClientRect().top + window.scrollY - (sticky ? wrap.offsetHeight : 0) - 24;
+    var target = document.querySelector(".layout");
+    var y = target.getBoundingClientRect().top + window.scrollY - (sticky ? wrap.offsetHeight : 0) - 8;
     if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
   }
-  function replay() {
-    S = fresh();
-    advance(0);
-  }
+  function replay() { S = fresh(); boxNow = null; advance(0); }
 
   document.getElementById("replayBtn").addEventListener("click", replay);
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && S.card) { toggleCard(null); return; }
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;

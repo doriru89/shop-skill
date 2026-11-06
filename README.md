@@ -151,11 +151,15 @@ section. The shape is real, the numbers are placeholders.
   Christmas lights for a two-storey house in a cold climate.
 
 [`demo/shop-workflow.html`](demo/shop-workflow.html) replays the Christmas-lights run as an
-interactive page: click through the four steps, watch the gate panel count the evidence,
-flip the "thin census" switch to see a gate fail and the recommendation downgrade itself to
-a preliminary read, and press "Are you sure?" to see a challenge answered with evidence
-instead of a flipped pick. Open the file in a browser, or use the hosted copy:
-https://claude.ai/artifact/RWmGQd9uTNnnKES9WhYnMd
+interactive page built around a map of the market (price against ladder time per year).
+Every product is a point; each decision you make dims what is ruled out and shrinks the
+box around what is left, until the sweet spot is literally a point on the map. Click any
+point for its card. Flip the "thin census" switch to see a gate fail and the recommendation
+downgrade itself to a preliminary read, and press "Are you sure?" to see a challenge
+answered with evidence instead of a flipped pick. Sources and blind spots stay at the
+bottom. The demo is a condensed view: a real run's messages carry the full tables that the
+page folds under "Show the full evidence". Open the file in a browser, or use the hosted
+copy: https://claude.ai/artifact/RWmGQd9uTNnnKES9WhYnMd
 
 ## What each step does
 
